@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: '已有 Release 的标签（如 v5.6.10）；留空只构建，不上传 Release'
+        description: '填写 Releases 页面已有的完整标签；留空从所选分支构建，不上传 Release'
         required: false
         type: string
 
