@@ -1,15 +1,15 @@
 /**
- * quick commands footer selection
+ * quick commands toolbar selection
  *
  * Click to toggle the quick-command bar. Click-based so it works identically
  * on touch (mobile) and mouse (desktop) — the old hover-to-open model was
  * unreliable on Android, where a tap synthesizes mouseleave and cancels the
  * open timer.
  *
- * The panel has two homes (see quick-commands-box.jsx): the footer box and the
+ * The panel has two homes (see quick-commands-box.jsx): the toolbar box and the
  * right side panel. While it is docked, this button is repurposed to open and
  * close that panel, exactly like the info and AI icons do — and `active` (fed
- * by the footer, which is already reactive) keeps it lit while it is showing.
+ * by the toolbar, which is already reactive) keeps it lit while it is showing.
  */
 
 import { PureComponent } from 'react'

@@ -89,11 +89,13 @@ async function launchApp () {
 }
 
 async function connectFixture (page) {
+  await page.evaluate(() => window.store.onNewSsh())
   await setupSshConnection(page, {
     host: '127.0.0.1',
     username: TEST_USERNAME,
     password: TEST_PASSWORD,
     port: String(TEST_PORT),
+    openForm: false,
     waitAfterConnect: 1000
   })
   await page.waitForFunction(() => window.store.currentTab?.status === 'success')
@@ -189,35 +191,35 @@ test('remote monitor bar renders, shares details, configures and persists', asyn
 
     const geometry = await running.page.evaluate(() => {
       const monitor = document.querySelector('.remote-monitor-bar').getBoundingClientRect()
-      const footer = document.querySelector('.main-footer').getBoundingClientRect()
+      const toolbar = document.querySelector('.session-current .terminal-control').getBoundingClientRect()
       const terminal = document.querySelector('.session-current .term-wrap').getBoundingClientRect()
       return {
         monitorTop: monitor.top,
         monitorBottom: monitor.bottom,
-        footerTop: footer.top,
-        terminalBottom: terminal.bottom
+        toolbarBottom: toolbar.bottom,
+        terminalTop: terminal.top
       }
     })
-    assert.ok(Math.abs(geometry.monitorBottom - geometry.footerTop) <= 2)
-    assert.ok(geometry.terminalBottom <= geometry.monitorTop + 2)
+    assert.ok(Math.abs(geometry.monitorTop - geometry.toolbarBottom) <= 2)
+    assert.ok(Math.abs(geometry.terminalTop - geometry.monitorBottom) <= 2)
 
     await running.page.evaluate(() => window.store.toggleSessFullscreen(true))
     await delay(700)
     const fullscreenGeometry = await running.page.evaluate(() => {
       const monitor = document.querySelector('.remote-monitor-bar').getBoundingClientRect()
-      const footer = document.querySelector('.main-footer').getBoundingClientRect()
+      const toolbar = document.querySelector('.session-current .terminal-control').getBoundingClientRect()
       const terminal = document.querySelector('.session-current .term-wrap').getBoundingClientRect()
       return {
         monitorLeft: monitor.left,
         monitorTop: monitor.top,
         monitorBottom: monitor.bottom,
-        footerTop: footer.top,
-        terminalBottom: terminal.bottom
+        toolbarBottom: toolbar.bottom,
+        terminalTop: terminal.top
       }
     })
     assert.ok(fullscreenGeometry.monitorLeft <= 2)
-    assert.ok(Math.abs(fullscreenGeometry.monitorBottom - fullscreenGeometry.footerTop) <= 2)
-    assert.ok(fullscreenGeometry.terminalBottom <= fullscreenGeometry.monitorTop + 2)
+    assert.ok(Math.abs(fullscreenGeometry.monitorTop - fullscreenGeometry.toolbarBottom) <= 2)
+    assert.ok(Math.abs(fullscreenGeometry.terminalTop - fullscreenGeometry.monitorBottom) <= 2)
     await running.page.evaluate(() => window.store.toggleSessFullscreen(false))
     await delay(700)
 

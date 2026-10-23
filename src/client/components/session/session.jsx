@@ -22,11 +22,18 @@ import {
   terminalWebType,
   terminalTelnetType,
   terminalFtpType,
-  terminalSpiceType
+  terminalSpiceType,
+  remoteMonitorBarHeight,
+  quickCommandBoxHeight
 } from '../../common/constants'
 import { refs } from '../common/ref'
 import sanitizeFilename from '../../common/sanitize-filename.js'
 import SessionControl from './session-control'
+import TerminalTools from '../footer/footer-entry'
+import TermSearch from '../terminal/term-search'
+import QuickCommandsFooterBox from '../quick-commands/quick-commands-box'
+import RemoteMonitorBar from '../remote-monitor/remote-monitor-bar-entry'
+import { isRemoteMonitorBarVisible } from '../remote-monitor/visibility'
 import LazyBoundary from '../common/lazy-boundary'
 import './session.styl'
 
@@ -219,6 +226,52 @@ export default class SessionWrapper extends Component {
     return this.props.width
   }
 
+  getToolbarPanelHeight = () => {
+    const { store } = window
+    if (store.activeTabId !== this.props.tab.id) {
+      return 0
+    }
+    const monitorHeight = isRemoteMonitorBarVisible(store) ? remoteMonitorBarHeight : 0
+    const quickCommandsHeight = store.inActiveTerminal &&
+      store.pinnedQuickCommandBar && !store.quickCommandsInRightPanel
+      ? quickCommandBoxHeight
+      : 0
+    return monitorHeight + quickCommandsHeight
+  }
+
+  computeContentHeight = () => {
+    return Math.max(0, this.props.computeHeight(this.props.height) - this.getToolbarPanelHeight())
+  }
+
+  renderToolbarPanels = () => {
+    const { store } = window
+    if (store.activeTabId !== this.props.tab.id) {
+      return null
+    }
+    const monitorHeight = isRemoteMonitorBarVisible(store) ? remoteMonitorBarHeight : 0
+    const termProps = {
+      currentTab: store.currentTab,
+      ...pick(store, [
+        'activeTabId',
+        'termSearchOpen',
+        'termSearch',
+        'termSearchOptions',
+        'termSearchMatchCount',
+        'termSearchMatchIndex'
+      ])
+    }
+    return (
+      <>
+        <RemoteMonitorBar
+          store={store}
+          style={{ height: remoteMonitorBarHeight }}
+        />
+        <QuickCommandsFooterBox store={store} style={{ top: monitorHeight }} />
+        <TermSearch {...termProps} style={{ top: this.getToolbarPanelHeight() }} />
+      </>
+    )
+  }
+
   renderTerminals = () => {
     const {
       sessionOptions,
@@ -368,9 +421,9 @@ export default class SessionWrapper extends Component {
 
   calcSftpWidthHeight = () => {
     const {
-      width,
-      height
+      width
     } = this.props
+    const height = this.computeContentHeight()
     if (!this.canSplitView() || !this.props.tab.sshSftpSplitView) {
       return {
         width,
@@ -389,9 +442,7 @@ export default class SessionWrapper extends Component {
 
   calcTermWidthHeight = () => {
     const width = this.getWidth()
-    const height = this.props.computeHeight(
-      this.props.height
-    )
+    const height = this.computeContentHeight()
     if (!this.canSplitView() || !this.props.tab.sshSftpSplitView) {
       return {
         width,
@@ -422,9 +473,7 @@ export default class SessionWrapper extends Component {
     ) {
       return null
     }
-    const height = this.props.computeHeight(
-      this.props.height
-    )
+    const height = this.computeContentHeight()
     const cls = pane === paneMap.fileManager ||
     (sshSftpSplitView && this.canSplitView())
       ? ''
@@ -453,7 +502,7 @@ export default class SessionWrapper extends Component {
   handleFullscreen = () => {
     // Make this tab the active tab before fullscreening
     window.store.activeTabId = this.props.tab.id
-    window.store.toggleSessFullscreen(true, this.props.tab.id)
+    window.store.toggleSessFullscreen(!window.store.fullscreen, this.props.tab.id)
   }
 
   toggleBroadcastInput = () => {
@@ -561,7 +610,7 @@ export default class SessionWrapper extends Component {
       className: notSplitVew ? 'not-split-view' : '',
       style: {
         width: this.props.width + 'px',
-        height: this.props.height + 'px'
+        height: this.computeContentHeight() + 'px'
       }
     }
     const paneProps = {
@@ -615,6 +664,7 @@ export default class SessionWrapper extends Component {
     )
     const divProps = {
       className: cls,
+      style: { '--session-toolbar-panels-height': `${this.getToolbarPanelHeight()}px` },
       onDragEnter: this.onDragEnter,
       onDragLeave: this.onDragLeave,
       onDrop: this.onDrop,
@@ -636,6 +686,7 @@ export default class SessionWrapper extends Component {
           canSplitView={this.canSplitView()}
           sftpPathFollowSsh={this.state.sftpPathFollowSsh}
           keepaliveEnabled={!!this.props.tab.keepaliveEnabled}
+          termSearchOpen={window.store.termSearchOpen}
           broadcastInput={this.state.broadcastInput}
           wrapDisabled={this.state.wrapDisabled}
           pasteWhenContextMenu={!!this.props.config.pasteWhenContextMenu}
@@ -650,10 +701,16 @@ export default class SessionWrapper extends Component {
           onOpenSearch={this.handleOpenSearch}
           onOpenContextMenu={this.handleOpenContextMenu}
           onExitGracefully={this.handleExitGracefully}
+          tools={this.props.tab.id === window.store.activeTabId
+            ? <TerminalTools store={window.store} />
+            : null}
         />
-        <Suspense fallback={null}>
-          {this.renderViews()}
-        </Suspense>
+        <div className='session-content'>
+          {this.renderToolbarPanels()}
+          <Suspense fallback={null}>
+            {this.renderViews()}
+          </Suspense>
+        </div>
       </div>
     )
   }

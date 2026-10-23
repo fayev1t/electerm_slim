@@ -211,7 +211,7 @@ export default class TermSearch extends PureComponent {
       selectall: true
     }
     return (
-      <div className='term-search-wrap'>
+      <div className='term-search-wrap' style={this.props.style}>
         <InputAutoFocus
           {...props}
         />

@@ -300,7 +300,7 @@ export default auto(function RemoteMonitorBar ({ store, style }) {
                     mouseLeaveDelay={0.15}
                     onOpenChange={open => handleOpenChange(item.id, open)}
                     open={openId === item.id}
-                    placement='top'
+                    placement='bottom'
                     trigger={touchMode ? 'click' : ['hover', 'focus']}
                   >
                     <button
@@ -327,7 +327,7 @@ export default auto(function RemoteMonitorBar ({ store, style }) {
           ids={REMOTE_MONITOR_ITEM_IDS}
           onOpenChange={setFilterOpen}
           onToggle={toggleItem}
-          placement='topRight'
+          placement='bottomRight'
           selected={enabledItems.map(item => item.id)}
         />
         <Button

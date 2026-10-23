@@ -38,6 +38,7 @@ export default function SessionControl (props) {
     canSplitView,
     sftpPathFollowSsh,
     keepaliveEnabled,
+    termSearchOpen,
     broadcastInput,
     wrapDisabled,
     pasteWhenContextMenu,
@@ -51,11 +52,12 @@ export default function SessionControl (props) {
     onOpenSearch,
     onOpenContextMenu,
     onExitGracefully,
-    onZoomFontSize
+    onZoomFontSize,
+    tools
   } = props
 
   if (isNotTerminalType) {
-    return null
+    return tools ? <div className='terminal-control'>{tools}</div> : null
   }
 
   const isSsh = !!tab.authType
@@ -239,7 +241,7 @@ export default function SessionControl (props) {
   function renderSearchIcon () {
     const title = e('search')
     return (
-      <Tooltip title={title} placement='bottomLeft'>
+      <Tooltip title={termSearchOpen ? null : title} placement='bottomLeft'>
         <SearchOutlined
           className='mg1r icon-info iblock pointer spliter'
           onClick={onOpenSearch}
@@ -341,6 +343,7 @@ export default function SessionControl (props) {
     return (
       <div className='terminal-control mobile-session-control'>
         {renderPaneControl()}
+        {tools}
         {renderContextMenuIcon(true)}
         <Popover
           content={extraIcons}
@@ -355,14 +358,17 @@ export default function SessionControl (props) {
 
   // ---- desktop ----
   return (
-    <div className='terminal-control fix'>
-      {renderPaneControl()}
-      {renderSftpPathFollowControl()}
-      {renderSplitToggle()}
-      {renderKeepaliveIcon()}
-      {renderBroadcastIcon()}
-      {renderWrapIcon()}
-      {renderExitGracefullyIcon()}
+    <div className='terminal-control'>
+      <div className='session-controls'>
+        {renderPaneControl()}
+        {renderSftpPathFollowControl()}
+        {renderSplitToggle()}
+        {renderKeepaliveIcon()}
+        {renderBroadcastIcon()}
+        {renderWrapIcon()}
+        {renderExitGracefullyIcon()}
+      </div>
+      {tools}
       {renderTermControls()}
     </div>
   )

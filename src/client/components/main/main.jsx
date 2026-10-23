@@ -20,10 +20,8 @@ import TransportsActionStore from '../file-transfer/transports-action-store.jsx'
 import classnames from 'classnames'
 import ShortcutControl from '../shortcuts/shortcut-control.jsx'
 import {
-  footerHeight,
   isMac,
   isWin,
-  remoteMonitorBarHeight,
   textTerminalBgValue
 } from '../../common/constants'
 import { isAIDisabled } from '../../common/ai-feature'
@@ -158,20 +156,13 @@ export default auto(function Index (props) {
     'is-mac': isMac,
     'not-mac': !isMac,
     'is-win': isWin,
-    // The left sidebar dock is desktop-only (see sidebar/index.jsx). This
-    // class drives the docked-layout CSS — the footer's left offset and the
-    // sidebar panel's top padding — so it has to follow the same gate as the
-    // layout maths in layout.jsx, or a pin persisted from a desktop session
-    // would restyle the mobile layout.
+    // Ignore a persisted desktop pin in the mobile drawer layout.
     pinned: pinned && !store.isMobile,
     'not-win': !isWin,
-    // the pinned quick-command box only shapes the layout while it is actually
-    // in the footer — docked in the right panel it renders there instead
+    // Only a quick-command panel in the toolbar reserves space above the terminal.
     'qm-pinned': pinnedQuickCommandBar && !quickCommandsInRightPanel,
     fullscreen,
-    // terminal fullscreen keeps the footer visible (rdp/vnc/spice fullscreen
-    // does not — the footer would be an empty bar there)
-    'fs-with-footer': fullscreen && store.inActiveTerminal,
+    'fs-with-toolbar': fullscreen && store.inActiveTerminal,
     'is-main': !isSecondInstance,
     'is-mobile': store.isMobile,
     'is-desktop': !store.isMobile,
@@ -181,8 +172,7 @@ export default auto(function Index (props) {
   const ext1 = {
     className: cls,
     style: {
-      '--left-side-bar-width': store.leftSideBarWidth + 'px',
-      '--footer-stack-height': `${footerHeight + (remoteMonitorBarVisible ? remoteMonitorBarHeight : 0)}px`
+      '--left-side-bar-width': store.leftSideBarWidth + 'px'
     }
   }
   // Get active tab IDs
@@ -272,7 +262,10 @@ export default auto(function Index (props) {
     rightPanelWidth: store.rightPanelWidth,
     title: rightPanelTitle,
     rightPanelTab,
-    isMobile: store.isMobile
+    isMobile: store.isMobile,
+    activeTabId: store.activeTabId,
+    layout: store.layout,
+    fullscreen
   }
   const sshConfigProps = {
     ...pick(store, [
@@ -375,10 +368,10 @@ export default auto(function Index (props) {
         <RightSidePanel {...rightPanelProps}>
           {!isAIDisabled() && <AIChat {...aiChatProps} />}
           <TerminalInfo key={store.activeTabId} store={store} {...deepCopy(store.terminalInfoProps)} />
-          {/* the cmd history panel has two homes; the footer popover is the
+          {/* the cmd history panel has two homes; the toolbar popover is the
               other one, and both are the same component (see cmd-history.jsx) */}
           <CmdHistory store={store} inline />
-          {/* same for the quick command panel: the footer box is the other home
+          {/* same for the quick command panel: the toolbar box is the other home
               (see quick-commands-box.jsx) */}
           <QuickCommandsFooterBox store={store} inline />
         </RightSidePanel>

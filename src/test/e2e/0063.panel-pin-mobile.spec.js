@@ -82,8 +82,8 @@ test('panel pin and drawer behaviour follow isMobile', async () => {
 
     // What actually paints at the bottom of the screen. Geometry alone does not
     // prove this: .sidebar is its own stacking context, so a drawer that spans
-    // to the bottom edge can still be painted over by the footer.
-    const footerCover = () => page.evaluate(() => {
+    // to the bottom edge can still be painted over by session content.
+    const drawerCoverage = () => page.evaluate(() => {
       const el = document.elementFromPoint(180, window.innerHeight - 20)
       const inDrawer = sel => !!(el && el.closest && el.closest(sel))
       return {
@@ -93,7 +93,7 @@ test('panel pin and drawer behaviour follow isMobile', async () => {
     })
 
     const geometry = () => page.evaluate(() => ({
-      footerLeft: document.querySelector('.main-footer').getBoundingClientRect().left,
+      toolbarLeft: document.querySelector('.session-current .terminal-control').getBoundingClientRect().left,
       panelBottom: document.querySelector('.right-side-panel').getBoundingClientRect().bottom
     }))
 
@@ -109,17 +109,16 @@ test('panel pin and drawer behaviour follow isMobile', async () => {
     assert.ok(desktop.rootClasses.includes('is-desktop'))
     // desktop keeps both resize handles and the stored widths: the left panel
     // starts at the 43px icon bar and is 300px wide, the right one is 500px and
-    // stops above the 36px footer
+    // starts below the top toolbar
     assert.deepEqual(await drawer(), {
       viewport: 1200,
       left: { left: 43, top: 0, width: 300, height: 800 },
-      right: { left: 700, top: 36, width: 500, height: 728 },
+      right: { left: 700, top: 68, width: 500, height: 732 },
       leftHandle: 1,
       rightHandle: 1
     })
-    // unpinned: the overlay clears the footer, the open left panel pushes the
-    // footer to 43 + 300 (footer-entry.jsx sets that inline)
-    assert.deepEqual(await geometry(), { footerLeft: 343, panelBottom: 764 })
+    // Unpinned drawers overlay the session; the top toolbar keeps its position.
+    assert.deepEqual(await geometry(), { toolbarLeft: 43, panelBottom: 800 })
 
     await page.evaluate(() => {
       window.store.setRightPanelPinned(true)
@@ -141,27 +140,27 @@ test('panel pin and drawer behaviour follow isMobile', async () => {
     assert.ok(!mobile.rootClasses.includes('pinned'))
     // both panels are full-screen drawers: they span the viewport from 0 to the
     // right edge — the left one covers the 43px icon bar too — run all the way
-    // to the bottom edge (footer included) and render no resize handle
+    // to the bottom edge and render no resize handle
     assert.deepEqual(await drawer(), {
       viewport: 375,
       left: { left: 0, top: 0, width: 375, height: 800 },
-      right: { left: 0, top: 36, width: 375, height: 764 },
+      right: { left: 0, top: 68, width: 375, height: 732 },
       leftHandle: 0,
       rightHandle: 0
     })
-    // ... and they really paint over the footer, which is what the extra
+    // ... and they really paint over session content, which is what the extra
     // z-index is for. Probed one drawer at a time: they overlap when both are
     // open, and the right one wins there.
-    assert.deepEqual(await footerCover(), { left: false, right: true })
+    assert.deepEqual(await drawerCoverage(), { left: false, right: true })
     await page.evaluate(() => { window.store.rightPanelVisible = false })
     await page.waitForFunction(() => document.querySelector('.right-side-panel') === null)
-    assert.deepEqual(await footerCover(), { left: true, right: false })
+    assert.deepEqual(await drawerCoverage(), { left: true, right: false })
     await page.evaluate(() => {
       window.store.openedSideBar = ''
       window.store.rightPanelVisible = true
     })
     await page.waitForFunction(() => document.querySelector('.sidebar-list').getBoundingClientRect().width === 0)
-    assert.deepEqual(await footerCover(), { left: false, right: true })
+    assert.deepEqual(await drawerCoverage(), { left: false, right: true })
     await page.evaluate(() => { window.store.setOpenedSideBar('bookmarks') })
     await page.waitForFunction(() => document.querySelector('.sidebar-list').getBoundingClientRect().width === 375)
     // a resize attempt is ignored: the panel keeps the viewport width and the
@@ -183,7 +182,7 @@ test('panel pin and drawer behaviour follow isMobile', async () => {
       storedRight: 500
     })
     // a drawer is a full-height surface on mobile: unlike the desktop overlay it
-    // does not stop above the footer
+    // reaches the bottom edge
     assert.equal((await geometry()).panelBottom, 800)
 
     // the stale pin must not dead-lock the bookmark toggle or the click-outside
@@ -199,7 +198,7 @@ test('panel pin and drawer behaviour follow isMobile', async () => {
       out.afterSecondCall = window.store.openedSideBar
       window.store.openLeftSidePanel('history')
       out.afterThirdCall = window.store.openedSideBar
-      out.footerLeft = document.querySelector('.main-footer').getBoundingClientRect().left
+      out.toolbarLeft = document.querySelector('.session-current .terminal-control').getBoundingClientRect().left
       out.pins = document.querySelectorAll('.anticon-pushpin').length
       return out
     })
@@ -207,9 +206,8 @@ test('panel pin and drawer behaviour follow isMobile', async () => {
     assert.equal(stalePin.afterOpen, 'bookmarks')
     assert.equal(stalePin.afterSecondCall, '')
     assert.equal(stalePin.afterThirdCall, 'history')
-    // mobile keeps the static footer offset from footer.styl: 43 (icon bar)
-    // + 1 (border), i.e. no panel width reserved
-    assert.equal(stalePin.footerLeft, 44)
+    // Mobile ignores the persisted pin and reserves only the icon bar.
+    assert.equal(stalePin.toolbarLeft, 43)
     assert.equal(stalePin.pins, 0)
 
     // --- back to desktop: the pin controls return, the widths survived the

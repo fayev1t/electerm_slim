@@ -79,6 +79,7 @@ export default function TabSelect (props) {
     <Popover
       content={<TabSelectList {...listProps} />}
       trigger='click'
+      placement='bottomRight'
     >
       <span className='pointer iblock pd1x'>
         ({selectedTabIds.length}) <CodeOutlined />

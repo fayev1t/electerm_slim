@@ -2,7 +2,7 @@
  * batch input module
  *
  * Unified click-to-open behavior for mobile and desktop:
- *   - click the compact trigger -> expand the textarea + tab-select panel
+ *   - click the compact trigger -> expand the textarea + tab-select panel below it
  *   - click outside the panel    -> collapse it
  *   - press Enter in the textarea -> send `cmd` to all selected tabs
  *
@@ -15,7 +15,8 @@
 import { Component, createRef } from 'react'
 import {
   Button,
-  Input
+  Input,
+  Popover
 } from 'antd'
 import {
   terminalWebType,
@@ -23,7 +24,6 @@ import {
   terminalVncType
 } from '../../common/constants'
 import TabSelect from './tab-select'
-import classNames from 'classnames'
 import deepCopy from 'json-deep-copy'
 
 const e = window.translate
@@ -35,46 +35,20 @@ export default class BatchInput extends Component {
       cmd: '',
       open: false
     }
-    this.outerRef = createRef()
     this.textAreaRef = createRef()
   }
 
-  componentDidMount () {
-    document.addEventListener('mousedown', this.handleDocClick)
-  }
-
-  componentWillUnmount () {
-    document.removeEventListener('mousedown', this.handleDocClick)
-  }
-
-  // Collapse the panel when the user clicks anywhere outside of it.
-  // Clicks inside an antd Popover (e.g. the tab-select popover, which renders
-  // in a portal outside this node) are treated as "inside" so interacting with
-  // tab selection does not collapse the panel.
-  handleDocClick = (ev) => {
-    if (!this.state.open) {
-      return
-    }
-    const node = this.outerRef.current
-    if (node && node.contains(ev.target)) {
-      return
-    }
-    if (ev.target && ev.target.closest && ev.target.closest('.ant-popover')) {
-      return
-    }
-    this.setState({ open: false })
-  }
-
-  handleToggle = () => {
-    const willOpen = !this.state.open
-    if (willOpen) {
+  handleOpenChange = (open) => {
+    if (open) {
       window.store.filterBatchInputSelectedTabIds()
     }
-    this.setState({ open: willOpen }, () => {
-      if (willOpen && this.textAreaRef.current) {
-        this.textAreaRef.current.focus()
-      }
-    })
+    this.setState({ open })
+  }
+
+  handleAfterOpenChange = (open) => {
+    if (open) {
+      this.textAreaRef.current?.focus()
+    }
   }
 
   handleSubmit = (ev) => {
@@ -119,7 +93,6 @@ export default class BatchInput extends Component {
         <Button
           size='small'
           type='text'
-          onClick={this.handleToggle}
         >
           B
         </Button>
@@ -127,7 +100,7 @@ export default class BatchInput extends Component {
     }
     // Desktop: an input-shaped, read-only affordance. It is NOT a real input —
     // clicking it expands the panel where the user actually types.
-    // Borderless so it blends into the footer background.
+    // Borderless so it blends into the toolbar background.
     return (
       <Input
         size='small'
@@ -136,7 +109,6 @@ export default class BatchInput extends Component {
         placeholder={e('batchInput')}
         className='batch-input-holder'
         style={{ cursor: 'pointer' }}
-        onClick={this.handleToggle}
       />
     )
   }
@@ -144,10 +116,6 @@ export default class BatchInput extends Component {
   render () {
     const { open } = this.state
     const { batchInputSelectedTabIds } = this.props
-    const cls = classNames(
-      'batch-input-outer',
-      { 'bi-show': open }
-    )
     const textAreaProps = {
       ref: this.textAreaRef,
       onPressEnter: this.handleSubmit,
@@ -167,20 +135,23 @@ export default class BatchInput extends Component {
       onSelect: window.store.onSelectBatchInputSelectedTabId
     }
     return (
-      <span
-        className={cls}
-        ref={this.outerRef}
+      <Popover
+        content={(
+          <div className='batch-input-panel'>
+            <Input.TextArea {...textAreaProps} />
+            <TabSelect {...tabSelectProps} />
+          </div>
+        )}
+        trigger='click'
+        placement='bottomLeft'
+        open={open}
+        onOpenChange={this.handleOpenChange}
+        afterOpenChange={open => this.handleAfterOpenChange(open)}
       >
-        <span className='bi-compact'>
+        <span className='batch-input-outer'>
           {this.renderTrigger()}
         </span>
-        <span className='bi-full'>
-          <Input.TextArea
-            {...textAreaProps}
-          />
-          <TabSelect {...tabSelectProps} />
-        </span>
-      </span>
+      </Popover>
     )
   }
 }

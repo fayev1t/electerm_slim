@@ -1,7 +1,7 @@
 /**
  * cmd history panel with popover
  *
- * The panel has two homes: the footer popover (default) and the right side
+ * The panel has two homes: the toolbar popover (default) and the right side
  * panel. Which one it is in is a stored preference (store.cmdHistoryInRightPanel),
  * so the same component renders both — `inline` drops the trigger/popover and
  * lets the right panel's own container wrap the panel body.
@@ -21,7 +21,7 @@ import {
   PlusOutlined,
   CodeOutlined,
   VerticalLeftOutlined,
-  VerticalAlignBottomOutlined
+  VerticalAlignTopOutlined
 } from '@ant-design/icons'
 import InputAutoFocus from '../common/input-auto-focus'
 import { getItemJSON, setItemJSON } from '../../common/safe-local-storage'
@@ -51,9 +51,9 @@ export default auto(function CmdHistory (props) {
   const menuRef = useRef(null)
   const [quickCommandCmd, setQuickCommandCmd] = useState('')
   const [multiTabCmd, setMultiTabCmd] = useState('')
-  // Footer mode only. The popover is controlled so that the trigger can be
+  // Toolbar mode only. The popover is controlled so that the trigger can be
   // repurposed (open the right panel instead, when the history lives there) and
-  // so that "move back to footer" can open it again from the store.
+  // so that "move back to toolbar" can open it again from the store.
   const [open, setOpen] = useState(false)
   const { terminalCommandHistory } = store
 
@@ -61,7 +61,7 @@ export default auto(function CmdHistory (props) {
     setItemJSON(SORT_BY_FREQ_KEY, sortByFrequency)
   }, [sortByFrequency])
 
-  // "move back to footer" happens in the right panel, which cannot reach this
+  // "move back to toolbar" happens in the right panel, which cannot reach this
   // component through props — it goes through the store, which needs a handle
   useEffect(() => {
     if (inline) {
@@ -212,7 +212,7 @@ export default auto(function CmdHistory (props) {
 
   // Dock the panel into the right side panel. The popover has to be closed on
   // the way out, or it would be left behind pointing at a panel that is no
-  // longer in the footer.
+  // longer in the toolbar.
   function handleMoveToRightPanel () {
     closeMenu()
     setOpen(false)
@@ -311,19 +311,13 @@ export default auto(function CmdHistory (props) {
     )
   }
 
-  // The two "move" icons are mirror images and sit in the same slot: the
-  // popover offers to dock the panel into the right side panel, the docked
-  // panel offers to hand it back to the footer popover. The glyphs are antd's
-  // "align" pair — an arrow into a bar on the right, an arrow into a bar at the
-  // bottom — so each points at the edge the panel is going to.
-  // Note VerticalLeftOutlined is the one whose bar is on the right (arrow
-  // pointing right); VerticalRightOutlined is its mirror and points left.
+  // Each arrow points to the panel's destination: the toolbar or right dock.
   function renderMoveIcon () {
     if (inline) {
       return (
-        <VerticalAlignBottomOutlined
+        <VerticalAlignTopOutlined
           className='cmd-history-move-icon pointer'
-          title={e('moveToFooter')}
+          title={e('moveToTop')}
           onClick={() => window.store.moveCmdHistoryToFooter()}
         />
       )
@@ -444,7 +438,7 @@ export default auto(function CmdHistory (props) {
       <Popover
         content={content}
         trigger='click'
-        placement='topLeft'
+        placement='bottomLeft'
         open={open}
         onOpenChange={handlePopoverOpenChange}
       >

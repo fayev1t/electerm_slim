@@ -3,31 +3,7 @@
 // Breakpoint: 600px (see mobileBreakpoint in constants.js)
 // ---------------------------------------------------------------------------
 .is-mobile
-  // Keep every terminal footer row on the same positioning reference as the
-  // touch shortcut bar. Mobile browsers change the visual viewport when their
-  // chrome or soft keyboard opens; mixing absolute footer rows with the fixed
-  // shortcut row makes the monitor/shortcut stack detach from the footer.
-  .main-footer,
-  .remote-monitor-bar
-    position fixed
-
-  // Side panels are full-screen drawers on mobile: they start at the viewport
-  // edge (the left one covers the icon bar too, so no strip of terminal is left
-  // showing) and run to the bottom edge — footer included. On desktop the
-  // footer is reserved *beside* the panel because it holds the panel's own
-  // trigger; on mobile the drawer is dismissed from its header (✕ / the
-  // bookmark/history tabs) instead, so there is nothing to keep clear. The
-  // inline width already comes from store.leftSidePanelWidth / rightPanelWidth,
-  // which are the viewport width here.
-  // Both are on the fixed frame (the right panel explicitly: its bottom edge
-  // must not drift from the fixed footer when the visual viewport changes), and
-  // both have to outrank the footer's 200 — it comes later in the DOM, so at an
-  // equal rank it would paint over the drawer. The left drawer lives inside
-  // .sidebar, which is its own stacking context (z-index 100), so lifting the
-  // drawer alone is not enough: the whole sidebar column has to clear the
-  // footer. The right panel is a root-level child, so its own z-index suffices.
-  // The icon bar takes no extra room from this: it is 43px wide and the footer
-  // starts at 44px.
+  // Mobile drawers use the viewport width and stay above session content.
   .sidebar
     z-index 250
   .sidebar-list
@@ -111,34 +87,18 @@
   .tabs-extra
     display none !important
 
-  // ---- 2. Footer batch input: show "B" button, click to expand
+  // ---- 2. Toolbar batch input: show "B" button, click to expand
   // match the quick-commands "Q" button: no flex-grow, same small margin
   .terminal-footer-center
     flex-grow 0
     margin-left 3px
-  .batch-input-outer
-    &.bi-show
-      .bi-full
-        // full-width fixed popup above the footer (mobile is narrow)
-        position fixed
-        left 0
-        right 0
-        bottom calc(var(--footer-stack-height, 36px) + var(--shortcut-bar-h, 0px) + var(--shortcut-bar-kb-offset, 0px))
-        z-index 200
-        background var(--main)
-        padding 8px 10px
-        box-shadow 0 -2px 8px rgba(0, 0, 0, 0.2)
-        width auto
-        min-width 0
-        border-radius 0
-
-  // ---- 3. Footer encode select: show icon, click to open dropdown
+  // ---- 3. Toolbar encode select: show icon, click to open dropdown
   //        match antd Button small icon size (~14px) used by sibling icons
   .mobile-encode-trigger,
   .terminal-info-icon,
   .show-sidebar-icon
     font-size 14px !important
-    line-height 36px
+    line-height 32px
     padding 0 4px
     &:hover
       color var(--text-light)

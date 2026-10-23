@@ -1,3 +1,29 @@
+.terminal-control
+  display flex
+  align-items center
+  height 32px
+  overflow-x auto
+  overflow-y hidden
+  scrollbar-width none
+  &::-webkit-scrollbar
+    display none
+  .term-sftp-tabs
+    float none
+    flex-shrink 0
+    white-space nowrap
+  .term-controls
+    float none
+    display flex
+    align-items center
+    flex-shrink 0
+    margin-left auto
+  .terminal-tools
+    min-width max-content
+.session-controls
+  display flex
+  align-items center
+  flex-shrink 0
+
 // Mobile session control: pane tabs always visible,
 // other icons shown in a floating Popover overlay
 .mobile-session-control
@@ -11,8 +37,7 @@
     float none
     display flex
     align-items center
-    flex 1
-    min-width 0
+    flex-shrink 0
 .mobile-control-toggle
 .mobile-context-menu-toggle
   font-size 16px

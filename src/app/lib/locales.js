@@ -4,6 +4,10 @@
 
 const { isDev, defaultLang } = require('../common/runtime-constants')
 const { resolve } = require('path')
+const moveToTopLabels = {
+  zh_cn: '移到顶部工具栏',
+  zh_tw: '移至頂部工具列'
+}
 
 function getOsLocale () {
   return require('os-locale-s')
@@ -23,12 +27,16 @@ async function loadLocales () {
     .map(fileName => {
       const filePath = resolve(localeFolder, fileName)
       const lang = require(filePath)
+      const id = fileName.replace('.js', '')
       return {
         path: filePath,
-        id: fileName.replace('.js', ''),
+        id,
         name: lang.name,
         reg: lang.match,
-        lang: lang.lang
+        lang: {
+          ...lang.lang,
+          moveToTop: moveToTopLabels[id] || 'Move to top toolbar'
+        }
       }
     })
   const langMap = langs.reduce((prev, l) => {

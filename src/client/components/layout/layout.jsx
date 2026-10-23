@@ -3,19 +3,11 @@ import Layouts from './layouts'
 import TabsWrap from '../tabs/index'
 import {
   splitConfig,
-  quickCommandBoxHeight,
-  footerHeight,
-  remoteMonitorBarHeight,
   shortcutBarHeight
 } from '../../common/constants'
 import layoutAlg from './layout-alg'
 import calcSessionSize from './session-size-alg'
-import TermSearch from '../terminal/term-search'
-import Footer from '../footer/footer-entry'
-import RemoteMonitorBar from '../remote-monitor/remote-monitor-bar-entry'
-import { isRemoteMonitorBarVisible } from '../remote-monitor/visibility'
 import SessionsWrap from '../session/sessions'
-import QuickCommandsFooterBox from '../quick-commands/quick-commands-box'
 import pixed from './pixed'
 import { pick } from 'lodash-es'
 import './layout.styl'
@@ -23,7 +15,7 @@ import './layout.styl'
 export default auto(function Layout (props) {
   const { store } = props
   const {
-    layout, config, currentTab
+    layout
   } = store
   const conf = splitConfig[layout]
 
@@ -36,8 +28,6 @@ export default auto(function Layout (props) {
       width,
       height,
       isMobile,
-      pinnedQuickCommandBar,
-      quickCommandsInRightPanel,
       leftSidePanelWidth,
       leftSideBarWidth,
       pinned,
@@ -45,19 +35,10 @@ export default auto(function Layout (props) {
       rightPanelPinned,
       rightPanelWidth,
       resizeTrigger,
-      inActiveTerminal,
       shortcutBarVisible,
       shortcutBarKbOffset
     } = props.store
-    const monitorHeight = isRemoteMonitorBarVisible(props.store) ? remoteMonitorBarHeight : 0
-    // a pin left on while the panel is docked in the right side panel reserves
-    // nothing: the footer box is not rendered then (quick-commands-box.jsx)
-    const qmPinnedHeight = inActiveTerminal &&
-      pinnedQuickCommandBar &&
-      !quickCommandsInRightPanel
-      ? quickCommandBoxHeight
-      : 0
-    const h = height - footerHeight - monitorHeight - qmPinnedHeight - (shortcutBarVisible ? shortcutBarHeight + shortcutBarKbOffset : 0) + resizeTrigger
+    const h = height - (shortcutBarVisible ? shortcutBarHeight + shortcutBarKbOffset : 0) + resizeTrigger
     const l = pinned && !isMobile ? leftSideBarWidth + leftSidePanelWidth : leftSideBarWidth
     const r = rightPanelVisible && rightPanelPinned && !isMobile ? rightPanelWidth : 0
     return {
@@ -134,24 +115,6 @@ export default auto(function Layout (props) {
     })
   }
 
-  const termProps = {
-    currentTab,
-    config,
-    ...pick(store, [
-      'activeTabId',
-      'termSearchOpen',
-      'termSearch',
-      'termSearchOptions',
-      'termSearchMatchCount',
-      'termSearchMatchIndex'
-    ])
-  }
-  const footerProps = {
-    store
-  }
-  const qmProps = {
-    store
-  }
   const sessionsProps = {
     styles: styles.wrapStyles,
     sizes,
@@ -184,23 +147,6 @@ export default auto(function Layout (props) {
     <Layouts {...layoutProps} key='layouts'>
       {renderSessions(conf, layout)}
     </Layouts>,
-    <SessionsWrap key='SessionsWrap' {...sessionsProps} />,
-    <TermSearch
-      key='TermSearch'
-      {...termProps}
-    />,
-    <QuickCommandsFooterBox
-      key='QuickCommandsFooterBox'
-      {...qmProps}
-    />,
-    <RemoteMonitorBar
-      key='RemoteMonitorBar'
-      store={store}
-      style={{ left: layoutSize.left, width, height: remoteMonitorBarHeight }}
-    />,
-    <Footer
-      key='Footer'
-      {...footerProps}
-    />
+    <SessionsWrap key='SessionsWrap' {...sessionsProps} />
   ]
 })

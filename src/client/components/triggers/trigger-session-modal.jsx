@@ -1,5 +1,5 @@
 /**
- * Trigger popup opened from the footer icon.
+ * Trigger popup opened from the session toolbar.
  * Global tab: all predefined triggers, switches change the global on/off
  * default (persisted in db, synced).
  * This-session tab: ALL triggers (predefined + session temp/bookmark rules)
@@ -11,6 +11,7 @@ import { Modal, Tabs, Alert, Switch, Button, Empty, Tag } from 'antd'
 import { SettingOutlined } from '@ant-design/icons'
 import TriggerEditor, { matchSummary, actionSummary } from './trigger-editor.jsx'
 import message from '../common/message'
+import { termControlHeight } from '../../common/constants'
 
 const e = window.translate
 
@@ -192,6 +193,7 @@ export default auto(function TriggerSessionModal (props) {
       onCancel={handleClose}
       footer={null}
       width={680}
+      style={{ top: (store.fullscreen ? 0 : store.tabsHeight) + termControlHeight + 8 }}
     >
       <Tabs items={items} />
     </Modal>

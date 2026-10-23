@@ -32,7 +32,7 @@
   align-items center
   gap 6px
 
-// The footer trigger stays lit while the history is docked in the right panel,
+// The toolbar trigger stays lit while the history is docked in the right panel,
 // same contract as the info and AI icons
 .cmd-history-trigger
   &.active
@@ -162,8 +162,8 @@
   overflow-y auto
 
 // Narrow screens: the popup is aligned to the history trigger (placement
-// topLeft) and is 324px wide, while the footer trigger sits within the first
-// ~96px of the screen (43px icon bar + footer margin + the icons before it), so
+// bottomLeft) and is 324px wide, while the toolbar trigger sits within the first
+// ~96px of the screen (43px icon bar + toolbar margin + the icons before it), so
 // below ~420px the popup's right edge would fall outside the window. antd's
 // auto-shift does not correct it, so pin the popup to the viewport instead.
 // Matched by its content: the popup lives in a body-level portal, so neither

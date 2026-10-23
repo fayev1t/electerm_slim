@@ -1,4 +1,4 @@
-import React, { memo, useRef, useEffect } from 'react'
+import React, { memo, useRef, useEffect, useLayoutEffect } from 'react'
 import DragHandle from '../common/drag-handle'
 import './right-side-panel.styl'
 import {
@@ -22,10 +22,38 @@ export default memo(function RightSidePanel (
     children,
     title,
     rightPanelTab,
-    isMobile
+    isMobile,
+    activeTabId,
+    layout,
+    fullscreen
   }
 ) {
   const panelRef = useRef(null)
+
+  useLayoutEffect(() => {
+    if (!rightPanelVisible) {
+      return
+    }
+    if (rightPanelPinned && !isMobile) {
+      panelRef.current.style.top = '0px'
+      return
+    }
+    const toolbar = document.querySelector('.session-current .terminal-control')
+    const session = document.querySelector('.session-current')
+    function alignPanel () {
+      if (panelRef.current) {
+        panelRef.current.style.top = `${toolbar?.getBoundingClientRect().bottom || 36}px`
+      }
+    }
+    alignPanel()
+    const observer = new ResizeObserver(alignPanel)
+    if (session) observer.observe(session)
+    window.addEventListener('resize', alignPanel)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', alignPanel)
+    }
+  }, [rightPanelVisible, rightPanelPinned, isMobile, activeTabId, layout, fullscreen])
 
   // Esc closes the panel, but never at the terminal's expense: xterm forwards
   // Esc to the remote shell, so stealing it there would break vim, less, etc.
@@ -55,9 +83,7 @@ export default memo(function RightSidePanel (
   if (!rightPanelVisible) {
     return null
   }
-  // Mobile has no pin control (it is not rendered below), so a pin persisted
-  // from a desktop session must not turn the panel into a dock here — that
-  // would make it full height over the footer for no reachable reason.
+  // A pin persisted on desktop stays inert in the mobile drawer.
   const pinned = rightPanelPinned && !isMobile
   // one glyph per tab, so the panel says what it is showing; the info tab is
   // the fallback, since a stale or unknown tab falls back to it everywhere else

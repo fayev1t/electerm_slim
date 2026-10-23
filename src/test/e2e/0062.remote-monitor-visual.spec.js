@@ -78,8 +78,7 @@ test('remote monitor styles, panel geometry and mobile overflow', async () => {
       await page.setViewportSize({ width, height: 800 })
       await page.waitForFunction(width => window.store.width === width, width)
       if (width === 375) {
-        assert.equal(await bar.evaluate(node => window.getComputedStyle(node).position), 'fixed')
-        assert.equal(await page.locator('.main-footer').evaluate(node => window.getComputedStyle(node).position), 'fixed')
+        assert.equal(await bar.evaluate(node => window.getComputedStyle(node).position), 'absolute')
       }
       for (const sidebar of [false, true]) {
         for (const pinned of [false, true]) {
@@ -134,8 +133,10 @@ test('remote monitor styles, panel geometry and mobile overflow', async () => {
     await page.waitForFunction(() => {
       const monitor = document.querySelector('.remote-monitor-bar').getBoundingClientRect()
       const terminal = document.querySelector('.session-current .term-wrap').getBoundingClientRect()
-      const footer = document.querySelector('.main-footer').getBoundingClientRect()
-      return Math.abs(monitor.bottom - footer.top) < 1 && Math.abs(terminal.bottom - monitor.top) < 1
+      const toolbar = document.querySelector('.session-current .terminal-control').getBoundingClientRect()
+      return Math.abs(monitor.top - toolbar.bottom) < 1 &&
+        Math.abs(terminal.top - monitor.bottom) < 1 &&
+        Math.abs(terminal.bottom - (window.innerHeight - 44 - 240)) < 1
     })
     await page.evaluate(() => {
       document.body.classList.remove('shortcut-bar-on')
@@ -160,7 +161,7 @@ test('remote monitor styles, panel geometry and mobile overflow', async () => {
     assert.equal(await panel.locator('[data-monitor-detail="hostname"] dl').innerText(), tooltipRows)
     // sub-pixel rounding on different runners can shift the height by 1px
     const height = (await page.locator('.sessions').boundingBox()).height
-    assert.ok(Math.abs(height - (terminalHeight + 28)) <= 1)
+    assert.ok(Math.abs(height - terminalHeight) <= 1)
     assert.equal(await panel.locator('[data-monitor-detail="memory"]').count(), 1)
     assert.equal(await panel.locator('[data-monitor-detail="swap"]').count(), 0)
     await page.evaluate(() => window.store.setConfig({ hideIP: true }))

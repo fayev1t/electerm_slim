@@ -26,7 +26,7 @@ const {
   Option
 } = Select
 
-export default auto(function FooterEntry (props) {
+export default auto(function TerminalTools (props) {
   function handleInfoPanel () {
     window.store.toggleInfoPanel()
   }
@@ -77,8 +77,7 @@ export default auto(function FooterEntry (props) {
 
   function renderQuickCommands () {
     const { rightPanelVisible, rightPanelTab, quickCommandsInRightPanel } = props.store
-    // the Q button only owns the right panel while the panel lives there; in
-    // the footer it toggles the floating box instead, which shows its own state
+    // Q toggles the right panel only while quick commands are docked there.
     const active = quickCommandsInRightPanel &&
       rightPanelVisible &&
       rightPanelTab === 'quickCommands'
@@ -144,6 +143,7 @@ export default auto(function FooterEntry (props) {
       onSelect: handleSwitchEncoding,
       size: 'small',
       variant: 'borderless',
+      placement: 'bottomRight',
       popupMatchSelectWidth: false
     }
     if (props.store.isMobile) {
@@ -158,7 +158,7 @@ export default auto(function FooterEntry (props) {
         <div className='terminal-footer-unit terminal-footer-info'>
           <Dropdown
             menu={{ items }}
-            placement='topRight'
+            placement='bottomRight'
             trigger={['click']}
           >
             <TranslationOutlined
@@ -221,18 +221,9 @@ export default auto(function FooterEntry (props) {
   }
 
   const {
-    leftSidePanelWidth,
     leftSideBarWidth,
-    openedSideBar,
-    inActiveTerminal,
-    rightPanelVisible,
-    rightPanelPinned,
-    rightPanelWidth,
-    isMobile
+    inActiveTerminal
   } = props.store
-  const w = leftSideBarWidth + leftSidePanelWidth
-  // icon bar hidden: show a control on the left of the footer to bring the
-  // sidebar back
   const showSidebarIcon = leftSideBarWidth === 0
     ? (
       <div className='terminal-footer-unit terminal-footer-show-sidebar'>
@@ -243,30 +234,11 @@ export default auto(function FooterEntry (props) {
       </div>
       )
     : null
-  // The footer mirrors the space layout.jsx reserves on both sides.
-  // Left: reserve while the panel is open OR pinned. A pinned left panel is
-  // always open, so this is a superset of the pin state — and it is what keeps
-  // the footer from painting over the panel, which spans bottom 0 in both
-  // states. Right: reserve only for a pinned panel, because the unpinned right
-  // panel is an overlay that stops above the footer and so never needs the
-  // space. Mobile reserves nothing on either side, matching layout.jsx, and the
-  // right panel has no pin control there at all.
-  const footerStyle = {}
-  if (openedSideBar && !isMobile) {
-    footerStyle.left = `${w}px`
-  }
-  if (rightPanelVisible && rightPanelPinned && !isMobile) {
-    footerStyle.right = `${rightPanelWidth}px`
-  }
-  const sideProps = {
-    className: 'main-footer',
-    style: footerStyle
-  }
   if (
     !inActiveTerminal
   ) {
     return (
-      <div className='main-footer' {...sideProps}>
+      <div className='terminal-tools'>
         {showSidebarIcon}
         <QmRunInTabs store={props.store} />
         <QmRecordStatus store={props.store} />
@@ -275,7 +247,7 @@ export default auto(function FooterEntry (props) {
     )
   }
   return (
-    <div {...sideProps}>
+    <div className='terminal-tools'>
       <div className='terminal-footer-flex'>
         {showSidebarIcon}
         {!isAIDisabled() && renderAIIcon()}
