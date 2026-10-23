@@ -1,60 +1,121 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
 name: win-nsis
 
 on:
   push:
     branches: [ build, test, build-only, win-nsis ]
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: '已有 Release 的标签（如 v5.6.10）；留空只构建，不上传 Release'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: win-nsis-${{ inputs.release_tag && format('refs/tags/{0}', inputs.release_tag) || github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build:
-
     runs-on: windows-2022
-    environment: build
+    timeout-minutes: 45
     if: ${{ !contains(github.event.head_commit.message, '[skip build]') && !contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[skip win]') && !contains(github.event.head_commit.message, '[skip nsis]') }}
-
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      npm_config_legacy_peer_deps: 'true'
+      WORKFLOW_NAME: win-nsis
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.release_tag && format('refs/tags/{0}', inputs.release_tag) || github.ref }}
+
+    - name: Check target release
+      if: ${{ github.event_name == 'release' || inputs.release_tag != '' }}
+      env:
+        GH_TOKEN: ${{ github.token }}
+        RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
+      run: gh release view "$env:RELEASE_TAG" --repo "$env:GITHUB_REPOSITORY"
+
     - name: Use Node.js 24.x
       uses: actions/setup-node@v4
       with:
         node-version: 24.x
+        cache: npm
 
     - uses: actions/setup-python@v5
       with:
-        python-version: '3.7' # Version range or exact version of  a Python version to use, using SemVer's version range syntax
-        architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
-    - run: npm config set legacy-peer-deps true
-    - run: npm install -g node-gyp
+        python-version: '3.11'
+        architecture: x64
 
-    # before_install:
-    # - run: npm install --global --production windows-build-tools --vs2015
-    - run: npm install -g yarn
-    - run: npm un node-pty serialport
-    - run: npm i
-    - run: npm i -S -E node-pty@1.1.0-beta14
-    - run: npm i -S -E serialport@13.0.0
+    - name: Install build tools
+      run: npm install --global yarn@1.22.22 node-gyp
 
-    - name: Install R2 dependencies if needed
-      if: ${{ contains(github.event.head_commit.message, '[r2]') }}
-      run: npm i -D @aws-sdk/client-s3
+    - name: Install dependencies
+      run: npm ci
 
-    # script:
-    - run: npm run b
-    
-    - name: Run pb
-      run: npm run pb
+    - name: Build application
+      run: npm run b
 
-    - name: build
+    - name: Prepare Windows installer
+      run: |
+        npm run pb
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        $config = Get-Content electron-builder.json -Raw | ConvertFrom-Json
+        $repository = $env:GITHUB_REPOSITORY.Split('/')
+        $config.win.publish = @{
+          provider = 'github'
+          owner = $repository[0]
+          repo = $repository[1]
+          channel = $env:WORKFLOW_NAME
+        }
+        $config | ConvertTo-Json -Depth 100 | Set-Content electron-builder.json -Encoding utf8
+        node -e "require('./src/build/bin/build-common').writeSrc('win-x64-installer.exe')"
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        node -e "require('./src/build/bin/build-common').patchNsisKeepShortcuts()"
+
+    - name: Package Windows x64 installer
+      run: npx electron-builder --win nsis --x64 --publish never
+
+    - name: Check packaged native modules
+      run: |
+        $script = @'
+        const path = require('node:path')
+        const modules = path.resolve('dist/win-unpacked/resources/app.asar/node_modules')
+        require(path.join(modules, 'node-pty'))
+        require(path.join(modules, 'serialport'))
+        console.log('Windows native modules loaded successfully')
+        '@
+        $env:ELECTRON_RUN_AS_NODE = '1'
+        & .\dist\win-unpacked\electerm.exe -e $script
+
+    - name: Save installer for download
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-x64-installer
+        path: |
+          dist/*-win-x64-installer.exe
+          dist/*-win-x64-installer.exe.blockmap
+          dist/win-nsis.yml
+        if-no-files-found: error
+        retention-days: 3
+
+    - name: Upload installer to release
+      if: ${{ github.event_name == 'release' || inputs.release_tag != '' }}
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BUILD_NUMBER: ${{ secrets.BUILD_NUMBER }}
-        WORKFLOW_NAME: ${{ github.workflow }}
-        CF_R2_ACCOUNT_ID: ${{ secrets.CF_R2_ACCOUNT_ID }}
-        CF_R2_BUCKET: ${{ secrets.CF_R2_BUCKET }}
-        CF_R2_ACCESS_KEY_ID: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
-        CF_R2_SECRET_ACCESS_KEY: ${{ secrets.CF_R2_SECRET_ACCESS_KEY }}
-
-      run: node src/build/bin/build-win-nsis
-
+        GH_TOKEN: ${{ github.token }}
+        RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
+      run: |
+        $files = @(Get-ChildItem dist -File | Where-Object {
+          $_.Name -match '-win-x64-installer\.exe(\.blockmap)?$' -or $_.Name -eq 'win-nsis.yml'
+        } | Select-Object -ExpandProperty FullName)
+        if (-not ($files | Where-Object { $_ -like '*-installer.exe' })) {
+          throw 'Windows installer was not generated'
+        }
+        gh release upload "$env:RELEASE_TAG" @files --repo "$env:GITHUB_REPOSITORY" --clobber
