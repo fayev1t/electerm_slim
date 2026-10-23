@@ -134,9 +134,9 @@ test('remote monitor styles, panel geometry and mobile overflow', async () => {
       const monitor = document.querySelector('.remote-monitor-bar').getBoundingClientRect()
       const terminal = document.querySelector('.session-current .term-wrap').getBoundingClientRect()
       const toolbar = document.querySelector('.session-current .terminal-control').getBoundingClientRect()
-      return Math.abs(monitor.top - toolbar.bottom) < 1 &&
-        Math.abs(terminal.top - monitor.bottom) < 1 &&
-        Math.abs(terminal.bottom - (window.innerHeight - 44 - 240)) < 1
+      return Math.abs(terminal.top - toolbar.bottom) < 1 &&
+        Math.abs(terminal.bottom - monitor.top) < 1 &&
+        Math.abs(monitor.bottom - (window.innerHeight - 44 - 240)) < 1
     })
     await page.evaluate(() => {
       document.body.classList.remove('shortcut-bar-on')

@@ -38,10 +38,11 @@
       display flex
     .remote-monitor-bar
       display flex
+      bottom calc(var(--shortcut-bar-h, 0px) + var(--shortcut-bar-kb-offset, 0px))
     .qm-wrap-tooltip
       display block
     .terminal-footer-show-sidebar
       display none
     .term-wrap
       top calc(32px + var(--session-toolbar-panels-height, 0px)) !important
-      height calc(100% - 32px - var(--session-toolbar-panels-height, 0px) - var(--shortcut-bar-h, 0px) - var(--shortcut-bar-kb-offset, 0px)) !important
+      height calc(100% - 32px - var(--session-toolbar-panels-height, 0px) - var(--session-monitor-bar-height, 0px) - var(--shortcut-bar-h, 0px) - var(--shortcut-bar-kb-offset, 0px)) !important

@@ -85,6 +85,10 @@ async function launchApp () {
   await page.waitForFunction(() => window.store?.configLoaded === true, null, {
     timeout: 30000
   })
+  // Keep the host machine's SSH config import prompt out of the fixture.
+  await page.evaluate(() => window.localStorage.setItem('ignore-ssh-config', 'yes'))
+  await page.setViewportSize({ width: 1200, height: 800 })
+  await page.waitForFunction(() => window.store.width === 1200)
   return { app, page }
 }
 
@@ -101,29 +105,15 @@ async function connectFixture (page) {
   await page.waitForFunction(() => window.store.currentTab?.status === 'success')
 }
 
-// The bookmark modal triggers the sticky "load ssh configs" prompt
-// (duration: 0). It sits in the bottom-right corner and blocks clicks on the
-// monitor bar controls, so dismiss it right after the first connection.
-async function dismissSshConfigNotify (page) {
-  const ignoreBtn = page.locator('.notification button:has-text("Ignore")')
-  if (await ignoreBtn.count().catch(() => 0)) {
-    await ignoreBtn.first().click().catch(() => {})
-  }
-  await page
-    .locator('.notification:has-text("Ignore")')
-    .waitFor({ state: 'detached', timeout: 5000 })
-    .catch(() => {})
-}
-
 test('remote monitor bar renders, shares details, configures and persists', async () => {
   let running = await launchApp()
   try {
-    await running.page.evaluate(items => {
-      window.store.setConfig({
-        remoteMonitorBarEnabled: true,
-        remoteMonitorBarItems: items
-      })
-    }, defaultItems)
+    const defaults = await running.page.evaluate(() => ({
+      enabled: window.store.config.remoteMonitorBarEnabled,
+      items: window.store.config.remoteMonitorBarItems
+    }))
+    assert.equal(defaults.enabled, true)
+    assert.deepEqual(defaults.items, defaultItems)
     // The production chunk (or dev module) must not load for local terminals.
     const monitorModuleLoaded = () => running.page.evaluate(() =>
       performance.getEntriesByType('resource').some(({ name }) =>
@@ -132,13 +122,16 @@ test('remote monitor bar renders, shares details, configures and persists', asyn
     )
     assert.equal(await monitorModuleLoaded(), false)
     await connectFixture(running.page)
-    await dismissSshConfigNotify(running.page)
 
     const bar = running.page.locator('.remote-monitor-bar')
     await bar.waitFor({ state: 'visible' })
     assert.equal(await monitorModuleLoaded(), true)
     assert.equal(await bar.locator('.remote-monitor-item').count(), 9)
     await bar.locator('.remote-monitor-item-cpuHistory svg').waitFor({ state: 'visible' })
+    await running.page.waitForFunction(() => {
+      return /\d/.test(document.querySelector('.remote-monitor-item-upload').textContent) &&
+        /\d/.test(document.querySelector('.remote-monitor-item-download').textContent)
+    })
     assert.equal(await bar.locator('.remote-monitor-item-cpuHistory svg').count(), 1)
     const borders = await bar.evaluate(node => {
       const item = node.querySelector('.remote-monitor-item')
@@ -197,11 +190,15 @@ test('remote monitor bar renders, shares details, configures and persists', asyn
         monitorTop: monitor.top,
         monitorBottom: monitor.bottom,
         toolbarBottom: toolbar.bottom,
-        terminalTop: terminal.top
+        terminalTop: terminal.top,
+        terminalBottom: terminal.bottom,
+        windowBottom: window.innerHeight
       }
     })
-    assert.ok(Math.abs(geometry.monitorTop - geometry.toolbarBottom) <= 2)
-    assert.ok(Math.abs(geometry.terminalTop - geometry.monitorBottom) <= 2)
+    assert.ok(Math.abs(geometry.terminalTop - geometry.toolbarBottom) <= 2)
+    assert.ok(Math.abs(geometry.terminalBottom - geometry.monitorTop) <= 2)
+    assert.ok(Math.abs(geometry.monitorBottom - geometry.windowBottom) <= 2)
+    await running.page.screenshot({ path: test.info().outputPath('remote-monitor-bottom.png') })
 
     await running.page.evaluate(() => window.store.toggleSessFullscreen(true))
     await delay(700)
@@ -214,12 +211,15 @@ test('remote monitor bar renders, shares details, configures and persists', asyn
         monitorTop: monitor.top,
         monitorBottom: monitor.bottom,
         toolbarBottom: toolbar.bottom,
-        terminalTop: terminal.top
+        terminalTop: terminal.top,
+        terminalBottom: terminal.bottom,
+        windowBottom: window.innerHeight
       }
     })
     assert.ok(fullscreenGeometry.monitorLeft <= 2)
-    assert.ok(Math.abs(fullscreenGeometry.monitorTop - fullscreenGeometry.toolbarBottom) <= 2)
-    assert.ok(Math.abs(fullscreenGeometry.terminalTop - fullscreenGeometry.monitorBottom) <= 2)
+    assert.ok(Math.abs(fullscreenGeometry.terminalTop - fullscreenGeometry.toolbarBottom) <= 2)
+    assert.ok(Math.abs(fullscreenGeometry.terminalBottom - fullscreenGeometry.monitorTop) <= 2)
+    assert.ok(Math.abs(fullscreenGeometry.monitorBottom - fullscreenGeometry.windowBottom) <= 2)
     await running.page.evaluate(() => window.store.toggleSessFullscreen(false))
     await delay(700)
 
@@ -229,6 +229,9 @@ test('remote monitor bar renders, shares details, configures and persists', asyn
       '.remote-monitor-popover[data-monitor-detail="memory"]'
     )
     await popover.waitFor({ state: 'visible' })
+    const popoverBounds = await popover.boundingBox()
+    const barBounds = await bar.boundingBox()
+    assert.ok(popoverBounds.y + popoverBounds.height <= barBounds.y)
     await memoryItem.click()
     await running.page.mouse.move(2, 2)
     await popover.waitFor({ state: 'visible' })
@@ -245,6 +248,7 @@ test('remote monitor bar renders, shares details, configures and persists', asyn
     await running.page.waitForFunction(() => {
       return document.querySelectorAll('.remote-monitor-popover .remote-monitor-table tbody tr').length > 0
     })
+    await running.page.screenshot({ path: test.info().outputPath('remote-monitor-bottom-details.png') })
     assert.equal(await popover.locator('.anticon-close-circle').count(), 0)
 
     await popover.locator('.ant-btn-link').click()
@@ -296,7 +300,6 @@ test('remote monitor bar renders, shares details, configures and persists', asyn
     assert.deepEqual(persisted.items, ['memory', 'users'])
 
     await connectFixture(running.page)
-    await dismissSshConfigNotify(running.page)
     const persistedBar = running.page.locator('.remote-monitor-bar')
     await persistedBar.waitFor({ state: 'visible' })
     assert.equal(
@@ -308,6 +311,10 @@ test('remote monitor bar renders, shares details, configures and persists', asyn
     await persistedBar.hover()
     await persistedBar.locator('.remote-monitor-controls .ant-btn').first().click()
     await persistedBar.waitFor({ state: 'detached' })
+    await running.page.waitForFunction(() => {
+      const terminal = document.querySelector('.session-current .term-wrap').getBoundingClientRect()
+      return Math.abs(terminal.bottom - window.innerHeight) <= 1
+    })
   } finally {
     await running.app.close().catch(() => {})
   }

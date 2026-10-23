@@ -231,16 +231,22 @@ export default class SessionWrapper extends Component {
     if (store.activeTabId !== this.props.tab.id) {
       return 0
     }
-    const monitorHeight = isRemoteMonitorBarVisible(store) ? remoteMonitorBarHeight : 0
-    const quickCommandsHeight = store.inActiveTerminal &&
+    return store.inActiveTerminal &&
       store.pinnedQuickCommandBar && !store.quickCommandsInRightPanel
       ? quickCommandBoxHeight
       : 0
-    return monitorHeight + quickCommandsHeight
+  }
+
+  getMonitorBarHeight = () => {
+    const { store } = window
+    return store.activeTabId === this.props.tab.id && isRemoteMonitorBarVisible(store)
+      ? remoteMonitorBarHeight
+      : 0
   }
 
   computeContentHeight = () => {
-    return Math.max(0, this.props.computeHeight(this.props.height) - this.getToolbarPanelHeight())
+    const height = this.props.computeHeight(this.props.height)
+    return Math.max(0, height - this.getToolbarPanelHeight() - this.getMonitorBarHeight())
   }
 
   renderToolbarPanels = () => {
@@ -248,7 +254,6 @@ export default class SessionWrapper extends Component {
     if (store.activeTabId !== this.props.tab.id) {
       return null
     }
-    const monitorHeight = isRemoteMonitorBarVisible(store) ? remoteMonitorBarHeight : 0
     const termProps = {
       currentTab: store.currentTab,
       ...pick(store, [
@@ -262,11 +267,7 @@ export default class SessionWrapper extends Component {
     }
     return (
       <>
-        <RemoteMonitorBar
-          store={store}
-          style={{ height: remoteMonitorBarHeight }}
-        />
-        <QuickCommandsFooterBox store={store} style={{ top: monitorHeight }} />
+        <QuickCommandsFooterBox store={store} />
         <TermSearch {...termProps} style={{ top: this.getToolbarPanelHeight() }} />
       </>
     )
@@ -664,7 +665,10 @@ export default class SessionWrapper extends Component {
     )
     const divProps = {
       className: cls,
-      style: { '--session-toolbar-panels-height': `${this.getToolbarPanelHeight()}px` },
+      style: {
+        '--session-toolbar-panels-height': `${this.getToolbarPanelHeight()}px`,
+        '--session-monitor-bar-height': `${this.getMonitorBarHeight()}px`
+      },
       onDragEnter: this.onDragEnter,
       onDragLeave: this.onDragLeave,
       onDrop: this.onDrop,
@@ -710,6 +714,9 @@ export default class SessionWrapper extends Component {
           <Suspense fallback={null}>
             {this.renderViews()}
           </Suspense>
+          {this.props.tab.id === window.store.activeTabId
+            ? <RemoteMonitorBar store={window.store} style={{ height: remoteMonitorBarHeight }} />
+            : null}
         </div>
       </div>
     )

@@ -59,7 +59,7 @@ export default {
     'network',
     'disks'
   ],
-  remoteMonitorBarEnabled: false,
+  remoteMonitorBarEnabled: true,
   remoteMonitorBarItems: [
     'hostname',
     'cpu',

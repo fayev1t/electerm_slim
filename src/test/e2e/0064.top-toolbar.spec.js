@@ -41,10 +41,11 @@ test('terminal tools and their panels stay at the top', async () => {
     await expect(tools).toBeVisible()
     await expect(page.locator('.main-footer')).toHaveCount(0)
     async function expectTerminalBottom () {
-      await expect.poll(async () => {
-        const bounds = await terminal.boundingBox()
-        return Math.abs(bounds.y + bounds.height - 800)
-      }).toBeLessThanOrEqual(1)
+      await expect.poll(() => page.evaluate(() => {
+        const terminal = document.querySelector('.session-current .term-wrap').getBoundingClientRect()
+        const monitor = document.querySelector('.session-current .remote-monitor-bar')
+        return Math.abs(terminal.bottom - (monitor ? monitor.getBoundingClientRect().top : window.innerHeight))
+      })).toBeLessThanOrEqual(1)
     }
     await expectTerminalBottom()
 
@@ -117,13 +118,23 @@ test('terminal tools and their panels stay at the top', async () => {
       store.setConfig({ remoteMonitorBarEnabled: true })
     })
     const monitor = page.locator('.session-current .remote-monitor-bar')
-    await expectBelowToolbar(monitor)
-    await expect.poll(async () => (await terminal.boundingBox()).y).toBe(96)
+    await expect(monitor).toBeVisible()
+    await expect.poll(async () => {
+      const bounds = await monitor.boundingBox()
+      return bounds.y + bounds.height
+    }).toBe(800)
+    await expect.poll(async () => (await terminal.boundingBox()).y).toBe(68)
+    await expectTerminalBottom()
+
+    await tools.locator('.quick-command-trigger').click()
+    await quickCommands.locator('.anticon-pushpin').click()
+    await expect.poll(async () => (await terminal.boundingBox()).y).toBe(248)
+    await expectTerminalBottom()
+    await quickCommands.getByRole('button', { name: 'close-circle', exact: true }).click()
 
     await page.evaluate(() => window.store.toggleSessFullscreen(true))
     await expect.poll(async () => (await toolbar.boundingBox()).y).toBe(0)
-    await expectBelowToolbar(monitor)
-    await expect.poll(async () => (await terminal.boundingBox()).y).toBe(60)
+    await expect.poll(async () => (await terminal.boundingBox()).y).toBe(32)
     await expectTerminalBottom()
     await page.screenshot({ path: test.info().outputPath('top-toolbar-fullscreen.png') })
     await page.evaluate(() => window.store.toggleSessFullscreen(false))

@@ -53,7 +53,7 @@ module.exports = exports.default = {
     'network',
     'disks'
   ],
-  remoteMonitorBarEnabled: false,
+  remoteMonitorBarEnabled: true,
   remoteMonitorBarItems: [
     'hostname',
     'cpu',
