@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: '填写 Releases 页面已有的完整标签；留空从所选分支构建，不上传 Release'
+        description: '首次打包请留空，软件版本会自动读取；仅给已有 Release 补包时填写标签'
         required: false
         type: string
 
@@ -32,16 +32,21 @@ jobs:
       WORKFLOW_NAME: win-nsis
       CSC_IDENTITY_AUTO_DISCOVERY: 'false'
     steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: ${{ inputs.release_tag && format('refs/tags/{0}', inputs.release_tag) || github.ref }}
-
     - name: Check target release
       if: ${{ github.event_name == 'release' || inputs.release_tag != '' }}
       env:
         GH_TOKEN: ${{ github.token }}
         RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
-      run: gh release view "$env:RELEASE_TAG" --repo "$env:GITHUB_REPOSITORY"
+      run: |
+        gh release view "$env:RELEASE_TAG" --repo "$env:GITHUB_REPOSITORY" --json tagName --jq .tagName
+        if ($LASTEXITCODE -ne 0) {
+          Write-Host "::error::找不到 Release '$env:RELEASE_TAG'。release_tag 不是软件版本号。首次打包请重新点击 Run workflow，选择 master，并将 release_tag 完全留空；需要发布时，先在 Releases 页面创建对应标签的 Release。"
+          exit 1
+        }
+
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.release_tag && format('refs/tags/{0}', inputs.release_tag) || github.ref }}
 
     - name: Use Node.js 24.x
       uses: actions/setup-node@v4
