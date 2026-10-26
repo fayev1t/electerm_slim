@@ -1,5 +1,5 @@
 /**
- * Build electerm for loong64 (LoongArch64) Linux
+ * Build electerm_slim for loong64 (LoongArch64) Linux
  *
  * This script orchestrates the loong64 build process:
  * 1. Build x64 version with electron v39.2.7 to get the asar
@@ -17,7 +17,7 @@ const { run } = require('./build-common')
 const SCRIPT_PATH = resolve(__dirname, 'build-linux-loong64.sh')
 
 async function main () {
-  echo('Starting electerm loong64 build...')
+  echo('Starting electerm_slim loong64 build...')
 
   try {
     await run(`bash ${SCRIPT_PATH}`)

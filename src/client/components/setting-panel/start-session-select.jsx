@@ -149,7 +149,7 @@ export default function StartSessionSelect (props) {
       label: (
         <span>
           <AppstoreOutlined /> {e('workspaces')}
-          <HelpIcon link='https://github.com/electerm/electerm/wiki/Workspace-Feature' />
+          <HelpIcon link='https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md' />
         </span>
       )
     }

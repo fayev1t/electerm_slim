@@ -3,9 +3,8 @@
  */
 import { isMacJs } from './platform.js'
 import { defaultThemeId, defaultThemeLightId } from './theme-defaults.js'
-import logoPath1Ref from '@electerm/electerm-resource/res/imgs/electerm-round-128x128.png'
-import logoPath2Ref from '@electerm/electerm-resource/res/imgs/electerm.png'
-import logoPath3Ref from '@electerm/electerm-resource/res/imgs/electerm-watermark.png'
+import logoPath1Ref from '../../assets/branding/images/electerm_slim-icon.png?no-inline'
+import logoPath2Ref from '../../assets/branding/images/electerm_slim-wordmark.png?no-inline'
 export const packInfo = typeof window.et.packInfo === 'undefined' ? window.pre.packInfo : window.et.packInfo
 const buildConst = (props) => {
   return props.reduce((prev, key) => {
@@ -18,7 +17,7 @@ const buildConst = (props) => {
 
 export const logoPath1 = logoPath1Ref.replace(/^\//, '') + '?ver=' + packInfo.version
 export const logoPath2 = logoPath2Ref.replace(/^\//, '') + '?ver=' + packInfo.version
-export const logoPath3 = logoPath3Ref.replace(/^\//, '') + '?ver=' + packInfo.version
+export const logoPath3 = logoPath2
 export const maxEditFileSize = 1024 * 3000
 export const defaultBookmarkGroupId = 'default'
 export const newBookmarkIdPrefix = 'new-bookmark'
@@ -235,10 +234,6 @@ export const mobileBreakpoint = 600
 // breakpoint matching the setting panel's `@media (max-width: 800px)` CSS —
 // must be kept in sync with setting-wrap.styl
 export const settingPanelMobileBreakpoint = 800
-export const baseUpdateCheckUrls = [
-  packInfo.homepage,
-  'https://gitee.com/github-zxdong262/electerm/raw/gh-pages'
-]
 export const syncTypes = buildConst([
   'github',
   'gitee',
@@ -247,21 +242,19 @@ export const syncTypes = buildConst([
   'webdav'
 ])
 export const allowedSyncTypes = () => {
+  const types = ['github', 'gitee', 'custom', 'webdav']
   const custom = window.et.syncTypes
   if (!Array.isArray(custom)) {
-    return Object.keys(syncTypes)
+    return types
   }
-  const list = custom.filter(type => syncTypes[type])
-  return list.length
-    ? list
-    : Object.keys(syncTypes)
+  const list = custom.filter(type => types.includes(type))
+  return list.length ? list : types
 }
 export const syncTokenCreateUrls = {
-  gitee: 'https://gitee.com/github-zxdong262/electerm/wikis/Create%20personal%20access%20token?sort_id=3028409',
-  github: 'https://github.com/electerm/electerm/wiki/Create-personal-access-token',
-  custom: 'https://github.com/electerm/electerm/wiki/Custom-sync-server',
-  cloud: 'https://sync.electerm.org',
-  webdav: 'https://github.com/electerm/electerm/wiki/WebDAV-sync'
+  gitee: 'https://gitee.com/profile/personal_access_tokens',
+  github: 'https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md',
+  custom: 'https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md',
+  webdav: 'https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md'
 }
 export const settingSyncId = 'setting-sync'
 export const settingTerminalId = 'setting-terminal'
@@ -320,23 +313,23 @@ export const checkedKeysLsKey = 'checked-keys'
 export const quickCommandLabelsLsKey = 'quick-command-label'
 export const localAddrBookmarkLsKey = 'local-addr-bookmark-keys'
 export const treeSortLsKey = 'tree-sort'
-export const sshTunnelHelpLink = 'https://github.com/electerm/electerm/wiki/How-to-use-ssh-tunnel'
-export const proxyHelpLink = 'https://github.com/electerm/electerm/wiki/proxy-format'
-export const regexHelpLink = 'https://github.com/electerm/electerm/wiki/Terminal-keywords-highlight-regular-expression-exmaples'
-export const connectionHoppingWikiLink = 'https://github.com/electerm/electerm/wiki/Connection-Hopping-Behavior-Change-in-electerm-since-v1.50.65'
-export const aiConfigWikiLink = 'https://github.com/electerm/electerm/wiki/AI-model-config-guide'
-export const installCommandHelpLink = 'https://github.com/electerm/electerm/wiki/Install-electerm-command'
-export const sshKeyContentOrPathHelpLink = 'https://github.com/electerm/electerm/wiki/SSH-Key-Content-vs-Key-Path'
+export const sshTunnelHelpLink = 'https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md'
+export const proxyHelpLink = 'https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md'
+export const regexHelpLink = 'https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md'
+export const connectionHoppingWikiLink = 'https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md'
+export const aiConfigWikiLink = 'https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md'
+export const installCommandHelpLink = 'https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md'
+export const sshKeyContentOrPathHelpLink = 'https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md'
 
 // Toggle options that have a wiki page explaining what they actually change.
 // renderToggle() looks the config key up here and renders a HelpIcon only for
 // the keys listed, so a toggle without an explanation stays clean. Add a page
-// under https://github.com/electerm/electerm/wiki first, then add its key here.
+// under https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md first, then add its key here.
 export const toggleWikiMap = {
   mouseEventsRequireAlt:
-    'https://github.com/electerm/electerm/wiki/Mouse-events-require-alt',
+    'https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md',
   sftpPathFollowSsh:
-    'https://github.com/electerm/electerm/wiki/Warning-about-sftp-follow-ssh-path-function'
+    'https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md'
 }
 export const aiChatModeLsKey = 'ai-chat-mode'
 export const aiAutoCompressLsKey = 'ai-auto-compress'

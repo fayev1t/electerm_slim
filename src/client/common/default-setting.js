@@ -42,7 +42,7 @@ export default {
   defaultEditor: '',
   terminalWordSeparator: './\\()"\'-:,.;<>~!@#$%^&*|+=[]{}`~ ?',
   confirmBeforeExit: false,
-  initDefaultTabOnStart: true,
+  initDefaultTabOnStart: false,
   screenReaderMode: false,
   autoRefreshWhenSwitchToSftp: false,
   addTimeStampToTermLog: false,

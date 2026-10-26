@@ -1,5 +1,5 @@
 name: "💥 Proposal / Feature (建议和新功能)"
-description: Propose a non-trivial change or new feature for electerm
+description: Propose a non-trivial change or new feature for electerm_slim
 body:
   - type: textarea
     attributes:

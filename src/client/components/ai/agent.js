@@ -31,7 +31,7 @@ function buildAgentSystemPrompt (config) {
   const baseRole = config.roleAI || 'You are a helpful assistant.'
   return appendMandatoryGuardrails(`${baseRole}
 
-You are operating inside electerm, a terminal/SSH client. You have access to tools that let you:
+You are operating inside electerm_slim, a terminal/SSH client. You have access to tools that let you:
 - Run commands in terminal tabs and read their output
 - Open new terminal tabs (local or SSH)
 - Manage bookmarks (create, list, open connections)

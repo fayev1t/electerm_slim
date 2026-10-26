@@ -132,7 +132,7 @@ export default function BatchOpEditor ({ widget }) {
 
   const handleEditWithSystemEditor = useCallback(async () => {
     const id = generate()
-    const tempPath = window.pre.resolve(window.pre.tempDir, `electerm-batch-op-${id}.json`)
+    const tempPath = window.pre.resolve(window.pre.tempDir, `electerm_slim-batch-op-${id}.json`)
     await window.fs.writeFile(tempPath, value)
     window.pre.runGlobalAsync('watchFile', tempPath)
     window.fs.openFile(tempPath).catch(window.store.onError)
@@ -147,7 +147,7 @@ export default function BatchOpEditor ({ widget }) {
 
   const handleEditWithCustom = useCallback(async (editorCommand) => {
     const id = generate()
-    const tempPath = window.pre.resolve(window.pre.tempDir, `electerm-batch-op-${id}.json`)
+    const tempPath = window.pre.resolve(window.pre.tempDir, `electerm_slim-batch-op-${id}.json`)
     await window.fs.writeFile(tempPath, value)
     window.pre.runGlobalAsync('watchFile', tempPath)
     await window.pre.runGlobalAsync('openFileWithEditor', tempPath, editorCommand)

@@ -116,7 +116,7 @@ export async function addTabFromCommandLine (store, opts) {
   // and use parseQuickConnect for proper parsing
   if (argv && argv.length) {
     const protocolUrl = argv.find(arg =>
-      /^(ssh|telnet|rdp|vnc|serial|spice|ftp|http|https|electerm):\/\//i.test(arg)
+      /^(ssh|telnet|rdp|vnc|serial|spice|ftp|http|https|electerm-slim):\/\//i.test(arg)
     )
     if (protocolUrl) {
       const parsed = parseQuickConnect(protocolUrl)
@@ -274,6 +274,7 @@ export default (Store) => {
     window.langMap = globs.langMap
     store.installSrc = globs.installSrc
     store.appPath = globs.appPath
+    store.dataPath = globs.dataPath
     store.exePath = globs.exePath
     store.isPortable = globs.isPortable
     store.widgetLogPath = globs.widgetLogPath || ''

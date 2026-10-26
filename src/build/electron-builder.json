@@ -1,9 +1,9 @@
 {
-  "appId": "org.electerm.electerm",
+  "appId": "io.github.fayev1t.electerm-slim",
   "directories": {
     "app": "work/app",
     "output": "dist",
-    "buildResources": "node_modules/@electerm/electerm-resource/build-res"
+    "buildResources": "src/assets/branding/build"
   },
   "electronLanguages": [
     "en-US"
@@ -16,13 +16,14 @@
   "win": {
     "target": [
       "tar.gz",
-      "appx",
       "nsis"
     ],
-    "icon": "node_modules/@electerm/electerm-resource/build/icons-win.ico",
+    "icon": "src/assets/branding/build/icon.ico",
     "publish": {
       "provider": "github",
-      "channel": "${env.WORKFLOW_NAME}"
+      "channel": "${env.WORKFLOW_NAME}",
+      "owner": "fayev1t",
+      "repo": "electerm_slim"
     }
   },
   "protocols": [
@@ -63,9 +64,9 @@
       ]
     },
     {
-      "name": "Electerm Protocol",
+      "name": "electerm_slim Protocol",
       "schemes": [
-        "electerm"
+        "electerm-slim"
       ]
     }
   ],
@@ -78,12 +79,6 @@
       "role": "Viewer"
     }
   ],
-  "appx": {
-    "applicationId": "electerm",
-    "identityName": "64159ZHAOXudong.electerm",
-    "publisher": "CN=9F481654-170A-434C-8259-984D2EB1FD7F",
-    "publisherDisplayName": "ZHAO Xudong"
-  },
   "nsis": {
     "oneClick": false,
     "artifactName": "${productName}-${version}-${os}-${arch}-installer.${ext}",
@@ -92,10 +87,12 @@
   "mac": {
     "category": "public.app-category.developer-tools",
     "target": "dmg",
-    "icon": "node_modules/@electerm/electerm-resource/build/icons.icns",
+    "icon": "src/assets/branding/build/icon.icns",
     "publish": {
       "provider": "github",
-      "channel": "${env.WORKFLOW_NAME}"
+      "channel": "${env.WORKFLOW_NAME}",
+      "owner": "fayev1t",
+      "repo": "electerm_slim"
     },
     "hardenedRuntime": true,
     "gatekeeperAssess": false,
@@ -119,7 +116,7 @@
   },
   "linux": {
     "category": "Development;System;TerminalEmulator",
-    "icon": "node_modules/@electerm/electerm-resource/build-res/linux",
+    "icon": "src/assets/branding/build/icons",
     "target": [
       "rpm",
       "deb",
@@ -129,22 +126,33 @@
     ],
     "publish": {
       "provider": "github",
-      "channel": "${env.WORKFLOW_NAME}"
+      "channel": "${env.WORKFLOW_NAME}",
+      "owner": "fayev1t",
+      "repo": "electerm_slim"
     },
     "desktop": {
       "entry": {
-        "StartupWMClass": "electerm"
+        "StartupWMClass": "electerm_slim"
       }
-    }
+    },
+    "executableName": "electerm-slim",
+    "maintainer": "fayev1t <fayev1t@users.noreply.github.com>"
   },
   "snap": {
     "confinement": "classic",
     "publish": {
       "provider": "github",
-      "channel": "${env.WORKFLOW_NAME}"
+      "channel": "${env.WORKFLOW_NAME}",
+      "owner": "fayev1t",
+      "repo": "electerm_slim"
     }
   },
   "deb": {
-    "afterInstall": "src/build/bin/linux-deb-after-build.sh"
+    "afterInstall": "src/build/bin/linux-deb-after-build.sh",
+    "packageName": "electerm-slim"
+  },
+  "productName": "electerm_slim",
+  "rpm": {
+    "packageName": "electerm-slim"
   }
 }

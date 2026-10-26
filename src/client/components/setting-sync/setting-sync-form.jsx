@@ -47,9 +47,6 @@ export default function SyncForm (props) {
 
   const { syncType } = props
   function disabled () {
-    if (syncType === syncTypes.cloud) {
-      return !props.formData.token
-    }
     if (syncType === syncTypes.webdav) {
       const { serverUrl, username, password } = props.formData
       return !serverUrl || !username || !password
@@ -68,15 +65,10 @@ export default function SyncForm (props) {
     }
     if (res.gistId) {
       up[syncType + 'GistId'] = res.gistId
-    } else if (syncType === syncTypes.cloud) {
-      up[syncType + 'GistId'] = 'cloud'
     }
     up[syncType + 'SyncPassword'] = res.syncPassword || ''
     if (res.apiUrl) {
       up[syncType + 'ApiUrl'] = res.apiUrl
-    } else if (syncType === syncTypes.cloud) {
-      up[syncType + 'ApiUrl'] = 'https://sync.electerm.org/api/sync'
-      // up[syncType + 'ApiUrl'] = 'http://127.0.0.1:5678/api/sync'
     }
     if (res.proxy) {
       up[syncType + 'Proxy'] = res.proxy
@@ -178,7 +170,7 @@ export default function SyncForm (props) {
           title={
             <span>
               Gitee data sync is not recommended. For more information, please refer to the
-              <Link to='https://github.com/electerm/electerm/wiki/gitee-data-sync-warning' className='mg1l'>
+              <Link to='https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md' className='mg1l'>
                 wiki
               </Link>
               .
@@ -193,15 +185,6 @@ export default function SyncForm (props) {
     return null
   }
   function createUrlItem () {
-    if (syncType === syncTypes.cloud) {
-      return (
-        <p>
-          <Link to='https://sync.electerm.org'>
-            https://sync.electerm.org[Beta]
-          </Link>
-        </p>
-      )
-    }
     if (syncType === syncTypes.webdav) {
       return createWebdavItems()
     }
@@ -304,7 +287,7 @@ export default function SyncForm (props) {
   const syncPasswordName = e('encrypt') + ' ' + e('password')
   const syncPasswordLabel = createLabel(syncPasswordName, '')
   function createIdItem () {
-    if (syncType === syncTypes.cloud || syncType === syncTypes.webdav) {
+    if (syncType === syncTypes.webdav) {
       return null
     }
     return (

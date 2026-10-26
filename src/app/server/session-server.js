@@ -91,7 +91,7 @@ function hasIncompleteTrailingUtf8 (bufs) {
   return cont < needed
 }
 
-appDec(app)
+const wsApp = appDec(app)
 
 if (type === 'rdp') {
   app.ws('/rdp/:pid', function (ws, req) {
@@ -639,20 +639,39 @@ process.on('message', async (message) => {
 })
 
 const runServer = function () {
-  return new Promise((resolve) => {
-    app.listen(wsPort, electermHost, () => {
-      log.info('session server', 'runs on', electermHost, wsPort)
-      resolve()
+  return new Promise((resolve, reject) => {
+    const wss = wsApp.getWss()
+    // express-ws forwards HTTP listen errors to its WebSocket server first.
+    // Handle both emitters so a bind error reaches the parent over IPC.
+    wss.once('error', reject)
+    const server = app.listen(Number(wsPort) || 0, electermHost || '127.0.0.1', () => {
+      server.removeListener('error', reject)
+      wss.removeListener('error', reject)
+      const { port } = server.address()
+      log.info('session server', 'runs on', electermHost, port)
+      resolve(port)
     })
+    server.once('error', reject)
   })
 }
 
 async function main () {
-  await runServer()
-  process.send({ serverInited: true })
+  const port = await runServer()
+  process.send({ serverInited: true, port })
 }
 
-main()
+main().catch(err => {
+  log.error('Session server failed to start', err)
+  if (process.connected) {
+    process.send({
+      serverError: {
+        message: err.message,
+        code: err.code
+      }
+    })
+  }
+  cleanup()
+})
 
 let cleanupCalled = false
 function cleanup () {

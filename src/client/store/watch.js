@@ -107,12 +107,13 @@ export default store => {
     return store.showModal
   }).start()
 
-  autoRun(() => {
-    if (!isEmpty(store.config)) {
+  window.watchConfig = autoRun(() => {
+    if (!window.migrating && !isEmpty(store.config)) {
       window.pre.runGlobalAsync('saveUserConfig', store.config)
     }
     return store.config
-  }, func => debounce(func, 100)).start()
+  }, func => debounce(func, 100))
+  window.watchConfig.start()
 
   autoRun(() => {
     store.updateLastDataUpdateTime()

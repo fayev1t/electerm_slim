@@ -41,7 +41,7 @@ const { spawn } = require('child_process')
 const { app } = require('electron')
 
 // Copied next to app.asar by src/build/bin/build-linux-ppc64le.sh.
-const FONT_CONF_FILE = 'electerm-fonts.conf'
+const FONT_CONF_FILE = 'electerm-slim-fonts.conf'
 
 // Set on the process we restart, so that a box where even our own configuration
 // resolves no font goes to the web font instead of restarting for ever.
@@ -58,7 +58,7 @@ function fontConfFile () {
     if (fs.existsSync(configured)) {
       return configured
     }
-    console.error(`electerm: ${FONT_CONF_VAR} points at a missing file: ${configured}`)
+    console.error(`electerm_slim: ${FONT_CONF_VAR} points at a missing file: ${configured}`)
     return null
   }
   const bundled = join(process.resourcesPath || '', FONT_CONF_FILE)
@@ -79,7 +79,7 @@ function removeStaleInstanceSocket () {
       removeInstanceSocket()
     }
   } catch (err) {
-    console.error('electerm: could not drop the instance socket:', err.message)
+    console.error('electerm_slim: could not drop the instance socket:', err.message)
   }
 }
 
@@ -107,7 +107,7 @@ function restartWithFontConf (conf) {
     }).unref()
     return true
   } catch (err) {
-    console.error('electerm: could not restart with a fontconfig file:', err.message)
+    console.error('electerm_slim: could not restart with a fontconfig file:', err.message)
     return false
   }
 }
@@ -116,12 +116,12 @@ const fontConfNotice = conf => `
 ================================================================================
 Chromium cannot see any system font -- restarting with the bundled fontconfig
 ================================================================================
-Blink resolved no font at all, and the first glyph electerm needs would abort
+Blink resolved no font at all, and the first glyph electerm_slim needs would abort
 the renderer (SkFontMgr_FontConfigInterface: "Not implemented", exit code 133).
 
 fontconfig may well be fine in a shell (fc-list | wc -l, fc-match sans),
 because Electron links a fontconfig of its own, and on some systems that copy
-ends up with zero families. electerm is starting again once with an explicit
+ends up with zero families. electerm_slim is starting again once with an explicit
 font list:
 
   FONTCONFIG_FILE=${conf}
@@ -136,7 +136,7 @@ ELECTERM_FONTCONF=/path/to/file uses your file instead of the bundled one.
 
 /**
  * Wrap the font probe so that "renderer sees no font" restarts the app once
- * with electerm-fonts.conf instead of going straight to the web font.
+ * with electerm-slim-fonts.conf instead of going straight to the web font.
  *
  * Called at the end of lib/font-check.js, which owns the probe. The wrapper is
  * in place before create-window.js and create-app.js destructure the exports,
@@ -157,7 +157,7 @@ function install (fontCheck) {
     typeof fontCheck.resolveFontWorkaround !== 'function' ||
     typeof fontCheck.precheckFonts !== 'function'
   ) {
-    console.error('electerm: font-conf-fix: nothing to wrap, workaround disabled')
+    console.error('electerm_slim: font-conf-fix: nothing to wrap, workaround disabled')
     return
   }
   const original = fontCheck.resolveFontWorkaround

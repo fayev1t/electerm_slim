@@ -4,7 +4,8 @@
 
 import uid from './id-with-stamp'
 import {
-  paneMap
+  paneMap,
+  connectionMap
 } from './constants'
 
 const e = window.translate
@@ -18,6 +19,7 @@ export function updateCount (tab) {
 export default (removeTitle) => {
   const res = {
     id: uid(),
+    type: connectionMap.local,
     status: 'processing',
     pane: paneMap.terminal,
     title: e('newTerminal')

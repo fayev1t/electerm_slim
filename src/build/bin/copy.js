@@ -23,3 +23,8 @@ const to = resolve(
 
 rm('-rf', to)
 cp('-r', from, to)
+
+const imagesFrom = resolve(__dirname, '../../assets/branding/images')
+const imagesTo = resolve(__dirname, '../../../work/app/assets/images')
+rm('-rf', imagesTo)
+cp('-r', imagesFrom, imagesTo)

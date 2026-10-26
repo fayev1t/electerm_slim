@@ -26,7 +26,7 @@ module.exports = (config, env, sysLocale) => {
   let extraCaFile
   const systemCAs = getSystemCAs()
   if (systemCAs) {
-    extraCaFile = join(tmpdir(), `electerm-system-ca-${Date.now()}.pem`)
+    extraCaFile = join(tmpdir(), `electerm_slim-system-ca-${Date.now()}.pem`)
     writeFileSync(extraCaFile, systemCAs)
   }
 

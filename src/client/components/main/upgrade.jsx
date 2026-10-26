@@ -1,19 +1,16 @@
 import { PureComponent } from 'react'
 import { CloseOutlined, MinusSquareOutlined, UpCircleOutlined } from '@ant-design/icons'
-import { Button, Select, Space } from 'antd'
+import { Button } from 'antd'
 import { getLatestReleaseInfo, getLatestReleaseVersion, getDownloadUrl } from '../../common/update-check'
 import upgrade from '../../common/upgrade'
 import compare from '../../common/version-compare'
 import Link from '../common/external-link'
 import {
-  isMac,
-  isWin,
   packInfo,
   downloadUpgradeTimeout
 } from '../../common/constants'
 import { checkSkipSrc } from '../../common/check-skip-src'
 import { debounce } from 'lodash-es'
-import newTerm from '../../common/new-terminal'
 import Markdown from '../common/markdown'
 import downloadMirrors from '../../common/download-mirrors'
 import { refsStatic } from '../common/ref'
@@ -25,19 +22,7 @@ const {
   homepage
 } = packInfo
 
-const downloadMirrorList = [
-  'github',
-  'gh-proxy',
-  'atomgit',
-  'sourceforge',
-  'r2'
-]
-
 export default class Upgrade extends PureComponent {
-  state = {
-    mirror: downloadMirrorList[1]
-  }
-
   downloadTimer = null
 
   componentDidMount () {
@@ -82,12 +67,6 @@ export default class Upgrade extends PureComponent {
     window.store.upgradeInfo = {}
   }
 
-  handleMirrorChange = (mirror) => {
-    this.setState({
-      mirror
-    })
-  }
-
   onData = (upgradePercent) => {
     clearTimeout(this.downloadTimer)
     if (upgradePercent >= 100) {
@@ -123,23 +102,9 @@ export default class Upgrade extends PureComponent {
   }
 
   doUpgrade = debounce(async () => {
-    const { installSrc } = this.props
-    if (!isMac && !isWin && installSrc === 'npm') {
-      return window.store.addTab(
-        {
-          ...newTerm(undefined, true),
-          runScripts: [
-            {
-              script: 'npm install -g electerm',
-              delay: 500
-            }
-          ]
-        }
-      )
-    }
     if (window.et.downloadUpgradeFromBrowser) {
       const { releaseInfo } = this.props.upgradeInfo
-      const downloadUrl = getDownloadUrl(releaseInfo?.browserDownloadUrl, this.state.mirror)
+      const downloadUrl = getDownloadUrl(releaseInfo?.browserDownloadUrl)
       if (downloadUrl) {
         window.openLink(downloadUrl)
       }
@@ -150,7 +115,6 @@ export default class Upgrade extends PureComponent {
     })
     const proxy = window.store.getProxySetting()
     this.update = await upgrade({
-      mirror: this.state.mirror,
       proxy,
       onData: this.onData,
       onEnd: this.onEnd,
@@ -200,11 +164,8 @@ export default class Upgrade extends PureComponent {
       }
       return
     }
-    const canAutoUpgrade = installSrc || isWin || isMac
-    let releaseInfo
-    if (canAutoUpgrade) {
-      releaseInfo = await getLatestReleaseInfo()
-    }
+    const releaseInfo = await getLatestReleaseInfo(releaseVer)
+    const canAutoUpgrade = !!releaseInfo?.browserDownloadUrl
     this.changeProps({
       shouldUpgrade,
       releaseInfo,
@@ -286,23 +247,6 @@ export default class Upgrade extends PureComponent {
     )
   }
 
-  renderMirrorSelector = () => {
-    return (
-      <Select
-        value={this.state.mirror}
-        onChange={this.handleMirrorChange}
-        getPopupContainer={() => document.body}
-        size='small'
-        style={{ height: 32 }}
-        popupMatchSelectWidth={false}
-      >
-        {downloadMirrorList.map((opt) => (
-          <Select.Option key={opt} value={opt}>{opt}</Select.Option>
-        ))}
-      </Select>
-    )
-  }
-
   renderUpgradeButton = () => {
     const { upgrading, upgradePercent, checkingRemoteVersion } = this.props.upgradeInfo
     if (upgrading) {
@@ -321,8 +265,7 @@ export default class Upgrade extends PureComponent {
       )
     }
     return (
-      <Space.Compact>
-        {this.renderMirrorSelector()}
+      <div>
         <Button
           type='primary'
           icon={<UpCircleOutlined />}
@@ -333,14 +276,14 @@ export default class Upgrade extends PureComponent {
         >
           {e('upgrade')}
         </Button>
-      </Space.Compact>
+      </div>
     )
   }
 
   renderUpgradeContent = () => {
     const { installSrc } = this.props
     const skip = checkSkipSrc(installSrc)
-    if (skip) {
+    if (skip || !this.props.upgradeInfo.canAutoUpgrade) {
       return this.renderLinks()
     }
     return (

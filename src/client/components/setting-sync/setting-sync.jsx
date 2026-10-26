@@ -7,6 +7,7 @@ import { useEffect } from 'react'
 import SyncForm from './setting-sync-form'
 import { allowedSyncTypes, syncDataMaps } from '../../common/constants'
 import DataTransport from './data-import'
+import ElectermImport from './electerm-import'
 import DataSelect from './data-select'
 import { pick } from 'lodash-es'
 import { auto } from 'manate/react'
@@ -89,6 +90,7 @@ export default auto(function SyncSettingEntry (props) {
   }
   return (
     <div className='pd2l'>
+      {!window.et.isWebApp && <ElectermImport />}
       <DataTransport {...dataImportProps} />
       <Spin spinning={store.isSyncingSetting}>
         <Tabs

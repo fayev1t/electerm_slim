@@ -1,7 +1,7 @@
 {
-  "name": "electerm",
+  "name": "electerm_slim",
   "version": "0.1.0",
-  "description": "Open-sourced terminal/ssh/sftp/telnet/serialport/RDP/VNC/Spice/ftp client(Linux, Mac, Windows, Android, HarmonyOS, iOS).",
+  "description": "electerm_slim terminal, SSH and SFTP client for desktop.",
   "main": "app.js",
   "scripts": {
     "app": "node src/build/bin/app",
@@ -31,30 +31,27 @@
     "lock": "npm i --package-lock-only"
   },
   "license": "MIT",
-  "languageRepo": "https://github.com/electerm/electerm-locales",
-  "privacyNoticeLink": "https://github.com/electerm/electerm/wiki/privacy-notice",
-  "knownIssuesLink": "https://github.com/electerm/electerm/wiki/Know-issues",
-  "sponsorLink": "https://electerm.org/sponsor-electerm",
+  "languageRepo": "https://github.com/fayev1t/electerm_slim/issues",
+  "privacyNoticeLink": "https://github.com/fayev1t/electerm_slim/blob/master/src/docs/privacy.md",
+  "knownIssuesLink": "https://github.com/fayev1t/electerm_slim/issues",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/electerm/electerm.git"
+    "url": "git+https://github.com/fayev1t/electerm_slim.git"
   },
   "author": {
-    "name": "ZHAO Xudong",
-    "email": "zxdong@gmail.com",
-    "url": "https://github.com/zxdong262"
+    "name": "fayev1t",
+    "url": "https://github.com/fayev1t"
   },
   "bugs": {
-    "url": "https://github.com/electerm/electerm/issues"
+    "url": "https://github.com/fayev1t/electerm_slim/issues"
   },
-  "homepage": "https://electerm.org",
-  "releases": "https://github.com/electerm/electerm/releases",
+  "homepage": "https://github.com/fayev1t/electerm_slim",
+  "releases": "https://github.com/fayev1t/electerm_slim/releases",
   "engines": {
     "node": ">=16.0.0"
   },
   "devDependencies": {
     "@ant-design/icons": "6.2.5",
-    "@electerm/electerm-resource": "2.2.1",
     "@fontsource/maple-mono": "^5.2.5",
     "@novnc/novnc": "1.7.0",
     "@types/node": "22.9.3",
@@ -173,5 +170,7 @@
   "allowScripts": {
     "@serialport/bindings-cpp@13.0.0": true,
     "node-pty@1.2.0-beta.15": true
-  }
+  },
+  "productName": "electerm_slim",
+  "releaseApiUrl": "https://api.github.com/repos/fayev1t/electerm_slim/releases?per_page=100"
 }

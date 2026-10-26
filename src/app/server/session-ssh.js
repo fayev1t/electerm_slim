@@ -842,7 +842,7 @@ class TerminalSshBase extends TerminalBase {
           const retry = () => {
             if (start >= maxPort) {
               // every local x endpoint refused us, the remote app is stuck
-              this.notifyX11(`A remote app asked for X11 forwarding, but electerm could not reach any local X server (display: ${this.display || 'not set'}). ${x11Hint()}`)
+              this.notifyX11(`A remote app asked for X11 forwarding, but electerm_slim could not reach any local X server (display: ${this.display || 'not set'}). ${x11Hint()}`)
               return
             }
             const xserversock = new net.Socket()

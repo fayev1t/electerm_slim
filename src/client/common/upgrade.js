@@ -47,7 +47,7 @@ class Upgrade {
     ws.addEventListener('message', this.onData)
     ws.once((arg) => {
       onEnd(arg)
-    }, 'upgrade:end:' + id)
+    }, 'transfer:end:' + id)
     ws.once((arg) => {
       console.debug('upgrade error')
       console.debug(arg.error.stack)

@@ -37,7 +37,7 @@ try {
 
 // Quoted, because this resolves to an absolute path and is handed to a shell.
 // An unquoted path containing a space is split into separate arguments, so the
-// rebuild never runs on a checkout under e.g. C:\Users\me\Project Code\electerm.
+// rebuild never runs on a checkout under e.g. C:\Users\me\Project Code\electerm_slim.
 exec(`"${resolve(__dirname, '../../../node_modules/.bin/electron-rebuild')}"`)
 
 if (!existsSync(prePushPath)) {

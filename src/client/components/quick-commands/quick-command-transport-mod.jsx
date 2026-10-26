@@ -46,6 +46,6 @@ export default class QmTransport extends BookmarkTransport {
     const arr = store[this.name]
     const txt = JSON.stringify(arr, null, 2)
     const stamp = time(undefined, 'YYYY-MM-DD-HH-mm-ss')
-    download('electerm-' + this.name + '-' + stamp + '.json', txt)
+    download('electerm_slim-' + this.name + '-' + stamp + '.json', txt)
   }
 }

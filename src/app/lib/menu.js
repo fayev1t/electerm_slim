@@ -157,14 +157,14 @@ function buildMenu () {
           label: e('reportIssue'),
           click () {
             shell
-              .openExternal('https://github.com/electerm/electerm/issues/new')
+              .openExternal('https://github.com/fayev1t/electerm_slim/issues/new')
           }
         },
         {
           label: 'github',
           click () {
             shell
-              .openExternal('https://github.com/electerm/electerm')
+              .openExternal('https://github.com/fayev1t/electerm_slim')
           }
         },
         {

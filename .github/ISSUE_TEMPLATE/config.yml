@@ -1,5 +1,5 @@
-blank_issues_enabled: false
+blank_issues_enabled: true
 contact_links:
-  - name: ⁉️ Need help with Electerm?
-    url: https://github.com/electerm/electerm/discussions
-    about: Please start a discussion before opening a bug.
+  - name: electerm_slim 使用说明
+    url: https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md
+    about: 连接、更新、同步和命令行的基本说明。

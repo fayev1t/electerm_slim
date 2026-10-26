@@ -162,7 +162,7 @@ export default function QuickCommandForm (props) {
   const templatesStr = templates.map(t => {
     return `{{${t}}}`
   }).join(', ')
-  const wiki = 'https://github.com/electerm/electerm/wiki/quick-command-templates'
+  const wiki = 'https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md'
   const aiDisabled = isAIDisabled()
   // renderQm() uses hooks internally, so it must run on every render
   const qmItem = renderQm(form)

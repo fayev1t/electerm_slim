@@ -85,9 +85,9 @@ exports.patchAppImage = function patchAppImage () {
 
   // Copy icon for desktop integration (outside asar, accessible at runtime)
   const iconSrc = resolve(
-    __dirname, '../../../node_modules/@electerm/electerm-resource/res/imgs/electerm-round-128x128.png'
+    __dirname, '../../../src/assets/branding/images/electerm_slim-icon.png'
   )
-  const iconDst = resolve(workAssets, 'electerm-round-128x128.png')
+  const iconDst = resolve(workAssets, 'electerm_slim-icon.png')
   if (fs.existsSync(iconSrc)) {
     fs.copyFileSync(iconSrc, iconDst)
   }
@@ -359,7 +359,7 @@ exports.patchNsisKeepShortcuts = function patchNsisKeepShortcuts () {
  * Patch electron-builder's Snap target so classic confinement builds keep the
  * Chromium sandbox and do not force --no-sandbox into the generated launcher.
  *
- * electerm's packaged entrypoint rejects the --no-sandbox CLI flag, and classic
+ * electerm_slim's packaged entrypoint rejects the --no-sandbox CLI flag, and classic
  * snaps do not need the browser-support plug path used by strict confinement.
  */
 exports.patchSnapClassicSandbox = function patchSnapClassicSandbox () {

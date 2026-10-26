@@ -214,7 +214,7 @@ export default (Store) => {
   //   store.isSyncingSetting = true
   //   const token = store.getSyncToken(type)
   //   const data = {
-  //     description: 'sync electerm data',
+  //     description: 'sync electerm_slim data',
   //     files: {
   //       'placeholder.js': {
   //         content: 'placeholder'
@@ -532,7 +532,7 @@ export default (Store) => {
     }
 
     const gistData = {
-      description: 'sync electerm data',
+      description: 'sync electerm_slim data',
       files: {
         ...objs,
         'electerm-status.json': {
@@ -765,7 +765,7 @@ export default (Store) => {
     }
     objs.config = store.config
     const text = JSON.stringify(objs)
-    const name = dayjs().format('YYYY-MM-DD-HH-mm-ss') + '-electerm-all-data.json'
+    const name = dayjs().format('YYYY-MM-DD-HH-mm-ss') + '-electerm_slim-all-data.json'
     download(name, text)
   }
 

@@ -98,7 +98,7 @@ jobs:
         console.log('Windows native modules loaded successfully')
         '@
         $env:ELECTRON_RUN_AS_NODE = '1'
-        & .\dist\win-unpacked\electerm.exe -e $script
+        & .\dist\win-unpacked\electerm_slim.exe -e $script
 
     - name: Save installer for download
       uses: actions/upload-artifact@v4

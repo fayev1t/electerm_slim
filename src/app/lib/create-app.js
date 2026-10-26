@@ -25,7 +25,7 @@ exports.createApp = async function () {
   // Set desktop name so Linux taskbars (e.g. UOS/Deepin dde-dock) can match
   // the window to the .desktop file embedded in the AppImage.
   if (process.platform === 'linux' && app.setDesktopName) {
-    app.setDesktopName(packInfo.name)
+    app.setDesktopName(packInfo.name.replace(/_/g, '-') + '.desktop')
   }
   setupCommandLineSwitches()
 

@@ -120,7 +120,7 @@ describe('nedb write-counter compaction', () => {
   })
 
   const fileFor = table => path.join(
-    tmpDir, 'electerm', 'users', 'testuser', `electerm.${table}.nedb`
+    tmpDir, 'electerm_slim', 'users', 'testuser', `electerm_slim.${table}.nedb`
   )
   const countFor = table => compactCalls.filter(f => f === fileFor(table)).length
 

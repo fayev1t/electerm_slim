@@ -1,5 +1,5 @@
 /**
- * Build electerm for loong64 (LoongArch64) Linux - Legacy (old world)
+ * Build electerm_slim for loong64 (LoongArch64) Linux - Legacy (old world)
  *
  * This script orchestrates the loong64 legacy build process:
  * 1. Build x64 version with legacy deps to get the asar
@@ -17,7 +17,7 @@ const { run } = require('./build-common')
 const SCRIPT_PATH = resolve(__dirname, 'build-linux-loong64-legacy.sh')
 
 async function main () {
-  echo('Starting electerm loong64-legacy build...')
+  echo('Starting electerm_slim loong64-legacy build...')
 
   try {
     await run(`bash ${SCRIPT_PATH}`)

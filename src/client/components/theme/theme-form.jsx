@@ -321,8 +321,8 @@ export default function ThemeForm (props) {
       layout='vertical'
     >
       <div className='mg1b alignright'>
-        <Link to='https://theme.electerm.org'>
-          <SkinOutlined className='mg1r' />https://theme.electerm.org
+        <Link to='https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md'>
+          <SkinOutlined className='mg1r' />electerm_slim themes
         </Link>
       </div>
       {renderFuncs(id)}

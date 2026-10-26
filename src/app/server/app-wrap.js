@@ -7,7 +7,7 @@ module.exports = function (app) {
   // parse application/json
   app.use(express.json())
 
-  require('express-ws')(app, undefined, {
+  return require('express-ws')(app, undefined, {
     wsOptions: {
       perMessageDeflate: false
     }

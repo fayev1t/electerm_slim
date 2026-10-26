@@ -6,7 +6,7 @@
  *   node src/build/ppc64le/patch.js revert [appDir]
  *
  * Why it is not in the source tree: this is a workaround for the IBM ppc64le
- * Electron builds (see README.md), and none of it belongs in electerm itself.
+ * Electron builds (see README.md), and none of it belongs in electerm_slim itself.
  * The only caller is src/build/bin/build-linux-ppc64le.sh, which applies it to
  * work/app -- the tree electron-builder packs, filled by src/build/bin/prepare.js
  * with a byte-for-byte copy of src/app -- so a ppc64le build never touches a
@@ -17,7 +17,7 @@
  *
  *   1. copies lib/font-conf-fix.js and lib/font-check.js into <appDir>/lib/
  *      -- the probe is ppc64le-only as well, so it lives here next to the
- *      wrapper instead of in the electerm source tree
+ *      wrapper instead of in the electerm_slim source tree
  *   2. appends a block to <appDir>/lib/font-check.js that installs the wrapper
  *      around resolveFontWorkaround -- it runs while that module is still
  *      loading, so the wiring below destructures the wrapped export
@@ -56,8 +56,8 @@ const EXPORTS = [
   { source: FONT_CHECK_SOURCE, target: FONT_CHECK_TARGET }
 ]
 
-const BEGIN = '// >>> electerm ppc64le font workaround (src/build/ppc64le/patch.js)'
-const END = '// <<< electerm ppc64le font workaround'
+const BEGIN = '// >>> electerm_slim ppc64le font workaround (src/build/ppc64le/patch.js)'
+const END = '// <<< electerm_slim ppc64le font workaround'
 
 const BLOCKS = [
   {
@@ -78,7 +78,7 @@ const BLOCKS = [
 try {
   require('./font-conf-fix').install(module.exports)
 } catch (err) {
-  console.error('electerm: ppc64le font workaround not installed:', err)
+  console.error('electerm_slim: ppc64le font workaround not installed:', err)
 }
 ${END}
 `
@@ -90,7 +90,7 @@ ${END}
       [/module\.exports\s*=\s*\{/, 'the module.exports object']
     ],
     body: `${BEGIN}
-// font-conf-fix.js drops the socket lock before restarting electerm, otherwise
+// font-conf-fix.js drops the socket lock before restarting electerm_slim, otherwise
 // the new process can take itself for a second instance and quit.
 module.exports.removeInstanceSocket = function () {
   cleanupSocket()

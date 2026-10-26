@@ -6,9 +6,7 @@ import {
   UserOutlined,
   InfoCircleOutlined,
   AlignLeftOutlined,
-  BugOutlined,
-  HeartOutlined,
-  CloudOutlined
+  BugOutlined
 } from '@ant-design/icons'
 import { Tabs, Button } from 'antd'
 import Modal from '../common/modal'
@@ -138,10 +136,8 @@ export default auto(function InfoModal (props) {
       url: bugReportLink
     },
     releases: releaseLink,
-    sponsorLink,
     knownIssuesLink
   } = packInfo
-  const electermOnline = 'https://cloud.electerm.org'
   const link = releaseLink.replace('/releases', '')
   const { versions } = window.pre
   const deps = {
@@ -172,7 +168,7 @@ export default auto(function InfoModal (props) {
       children: (
         <>
           <LogoElem />
-          <p className='mg2b'>{e('desc')}</p>
+          <p className='mg2b'>{packInfo.description}</p>
           <RunningTime />
           <p className='mg1b'>
             <HomeOutlined /> <b>{e('homepage')}/{e('download')} ➾</b>
@@ -183,7 +179,7 @@ export default auto(function InfoModal (props) {
           <p className='mg1b'>
             <UserOutlined /> <b className='mg1r'>{e('author')} ➾</b>
             <Link to={authorUrl} className='mg1l'>
-              {authorName} ({email})
+              {authorName}{email ? ` (${email})` : ''}
             </Link>
           </p>
           <p className='mg1b'>
@@ -220,18 +216,6 @@ export default auto(function InfoModal (props) {
             <AlignLeftOutlined /> <b className='mg1r'>{e('knownIssues')} ➾</b>
             <Link to={knownIssuesLink} className='mg1l'>
               {knownIssuesLink}
-            </Link>
-          </p>
-          <p className='mg1b'>
-            <CloudOutlined /> <b className='mg1r'>electerm Online ➾</b>
-            <Link to={electermOnline} className='mg1l'>
-              {electermOnline}
-            </Link>
-          </p>
-          <p className='mg1b'>
-            <HeartOutlined /> <b className='mg1r'>{e('sponsorElecterm')} ➾</b>
-            <Link to={sponsorLink} className='mg1l'>
-              {sponsorLink}
             </Link>
           </p>
           <p className='mg1b'>

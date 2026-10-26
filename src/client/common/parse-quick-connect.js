@@ -7,10 +7,10 @@
  * Basic Format:
  * protocol://[username:password@]host[:port]?anyQueryParam=anyValue&opts={"key":"value"}
  *
- * electerm:// Format (default type is ssh):
- * electerm://[username:password@]host[:port]?type=ssh&anyQueryParam=anyValue
- * electerm://host?type=telnet
- * electerm://user@host:22?type=vnc
+ * electerm-slim:// Format (default type is ssh):
+ * electerm-slim://[username:password@]host[:port]?type=ssh&anyQueryParam=anyValue
+ * electerm-slim://host?type=telnet
+ * electerm-slim://user@host:22?type=vnc
  *
  * Shortcut Format (SSH default):
  * user@host
@@ -21,7 +21,7 @@
 
 import DANGEROUS_SESSION_FIELDS from './dangerous-session-fields'
 
-const SUPPORTED_PROTOCOLS = ['ssh', 'telnet', 'vnc', 'rdp', 'spice', 'serial', 'ftp', 'http', 'https', 'electerm']
+const SUPPORTED_PROTOCOLS = ['ssh', 'telnet', 'vnc', 'rdp', 'spice', 'serial', 'ftp', 'http', 'https', 'electerm-slim']
 
 /**
  * Deny list for opts keys.
@@ -65,7 +65,7 @@ const DEFAULT_PORTS = {
   ftp: 21,
   http: 80,
   https: 443,
-  electerm: 22 // electerm defaults to SSH port
+  'electerm-slim': 22 // electerm defaults to SSH port
 }
 
 /**
@@ -146,7 +146,7 @@ function parseQuickConnect (str) {
     const input = trimmed.replace(/\/+$/, '')
 
     // Detect protocol
-    const protocolMatch = input.match(/^(ssh|telnet|vnc|rdp|spice|serial|ftp|https?|electerm):\/\//i)
+    const protocolMatch = input.match(/^(ssh|telnet|vnc|rdp|spice|serial|ftp|https?|electerm-slim):\/\//i)
 
     let protocol = ''
     let connectionString = ''
@@ -341,8 +341,8 @@ function parseQuickConnect (str) {
     let finalProtocol = protocol
     let webProtocol = originalProtocol // Store original for web type
 
-    // Handle electerm:// protocol - extract type from query params, default to ssh
-    if (originalProtocol === 'electerm') {
+    // Handle electerm-slim:// protocol - extract type from query params, default to ssh
+    if (originalProtocol === 'electerm-slim') {
       // Parse query params to get type
       const params = new URLSearchParams(queryStr)
       finalProtocol = params.get('type') || params.get('tp') || 'ssh'

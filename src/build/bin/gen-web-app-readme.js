@@ -6,7 +6,7 @@ const { resolve } = require('path')
 const from = resolve(__dirname, '../../../README.md')
 const to = resolve(__dirname, '../web-app/README.md')
 
-const EXTRA_LINE = 'This is react components pack for electerm sub projects'
+const EXTRA_LINE = 'This is react components pack for electerm_slim sub projects'
 
 const content = fs.readFileSync(from, 'utf8')
 const lines = content.split('\n')

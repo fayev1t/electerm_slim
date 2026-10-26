@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="electerm_slim">
+  <!-- 16x16 像素网格：方块 es，右下两级灰色挤出投影 -->
+  <g shape-rendering="crispEdges">
+    <g fill="#3a3a3a">
+      <rect x="352" y="160" width="64" height="32"/>
+      <rect x="480" y="160" width="32" height="32"/>
+      <rect x="448" y="192" width="64" height="32"/>
+      <rect x="256" y="256" width="32" height="32"/>
+      <rect x="480" y="256" width="32" height="32"/>
+      <rect x="128" y="288" width="128" height="32"/>
+      <rect x="480" y="288" width="32" height="32"/>
+      <rect x="480" y="320" width="32" height="32"/>
+      <rect x="480" y="352" width="32" height="32"/>
+      <rect x="224" y="384" width="64" height="32"/>
+      <rect x="448" y="384" width="64" height="32"/>
+      <rect x="128" y="416" width="128" height="32"/>
+      <rect x="352" y="416" width="128" height="32"/>
+    </g>
+    <g fill="#6e6e6e">
+      <rect x="224" y="128" width="32" height="32"/>
+      <rect x="448" y="128" width="32" height="32"/>
+      <rect x="224" y="160" width="32" height="32"/>
+      <rect x="320" y="160" width="32" height="32"/>
+      <rect x="416" y="160" width="64" height="32"/>
+      <rect x="224" y="192" width="32" height="32"/>
+      <rect x="224" y="224" width="32" height="32"/>
+      <rect x="448" y="224" width="32" height="32"/>
+      <rect x="96" y="256" width="160" height="32"/>
+      <rect x="288" y="256" width="96" height="32"/>
+      <rect x="448" y="256" width="32" height="32"/>
+      <rect x="96" y="288" width="32" height="32"/>
+      <rect x="448" y="288" width="32" height="32"/>
+      <rect x="448" y="320" width="32" height="32"/>
+      <rect x="192" y="352" width="64" height="32"/>
+      <rect x="416" y="352" width="64" height="32"/>
+      <rect x="96" y="384" width="128" height="32"/>
+      <rect x="320" y="384" width="128" height="32"/>
+    </g>
+    <g fill="#f5f5f5">
+      <rect x="64" y="64" width="128" height="32"/>
+      <rect x="32" y="96" width="192" height="32"/>
+      <rect x="32" y="128" width="64" height="32"/>
+      <rect x="160" y="128" width="64" height="32"/>
+      <rect x="32" y="160" width="64" height="32"/>
+      <rect x="160" y="160" width="64" height="32"/>
+      <rect x="32" y="192" width="192" height="32"/>
+      <rect x="32" y="224" width="192" height="32"/>
+      <rect x="32" y="256" width="64" height="32"/>
+      <rect x="32" y="288" width="64" height="32"/>
+      <rect x="32" y="320" width="192" height="32"/>
+      <rect x="64" y="352" width="128" height="32"/>
+    </g>
+    <g fill="#dcdcdc">
+      <rect x="288" y="64" width="128" height="32"/>
+      <rect x="256" y="96" width="192" height="32"/>
+      <rect x="256" y="128" width="64" height="32"/>
+      <rect x="384" y="128" width="64" height="32"/>
+      <rect x="256" y="160" width="64" height="32"/>
+      <rect x="256" y="192" width="192" height="32"/>
+      <rect x="256" y="224" width="192" height="32"/>
+      <rect x="384" y="256" width="64" height="32"/>
+      <rect x="256" y="288" width="64" height="32"/>
+      <rect x="384" y="288" width="64" height="32"/>
+      <rect x="256" y="320" width="192" height="32"/>
+      <rect x="288" y="352" width="128" height="32"/>
+    </g>
+  </g>
+</svg>

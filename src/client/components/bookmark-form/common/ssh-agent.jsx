@@ -28,7 +28,7 @@ export default function SshAgent () {
           >
             <Input placeholder={e('SSH Agent Path')} />
           </FormItem>
-          <HelpIcon link='https://github.com/electerm/electerm/wiki/ssh-agent' />
+          <HelpIcon link='https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md' />
         </Space>
       </FormItem>
       <FormItem

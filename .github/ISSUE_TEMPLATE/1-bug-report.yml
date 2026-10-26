@@ -4,38 +4,20 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for reporting an issue.
-
-        This issue tracker is for bugs and issues found within Electerm.
-        If you require more general support please start a discussion on our discussion board https://github.com/electerm/electerm/discussions
-
-        Please fill in as much of the form below as you're able.
-
-        Before continue, make sure you are using the latest release: check https://github.com/electerm/electerm/releases for latest release, also please
-
-        仅用来追踪bug, 如果有其他的讨论请移步讨论区 https://github.com/electerm/electerm/discussions, 请务必确保问题是基于最新版本: https://github.com/electerm/electerm/releases
+        请先确认使用的是本仓库的最新版本：https://github.com/fayev1t/electerm_slim/releases
+        填写版本、系统和重现步骤，日志或截图请先移除密码和密钥。
 
   - type: input
     attributes:
-      label: Electerm Version and download file extension(Electerm版本和下载文件后缀)
-      description: |
-        - electerm-xx.xx.xx-linux-amd64.deb
-        - electerm-xx.xx.xx-linux-amd64.snap
-        - electerm-xx.xx.xx-linux-x64.tar.gz
-        - electerm-xx.xx.xx-linux-x86_64.rpm
-        - electerm-xx.xx.xx-mac-arm64.dmg
-        - electerm-xx.xx.xx-mac-x64.dmg
-        - electerm-xx.xx.xx-win-x64-installer.exe
-        - electerm-xx.xx.xx-win-x64-loose.tar.gz
-        - electerm-xx.xx.xx-win-x64.appx
-        - electerm-xx.xx.xx-win-x64.tar.gz
+      label: electerm_slim Version and download file extension(electerm_slim版本和下载文件后缀)
+      description: "例如 electerm_slim-0.1.0-win-x64-installer.exe"
     validations:
       required: true
   - type: input
     attributes:
       label: Platform detail (平台详情)
       description: |
-        windows 7/8/10/11, mac os(ARM or x64), or linux
+        请填写系统版本和架构，例如 Windows 11 x64、macOS ARM64、Linux x64
         UNIX: output of `uname -a`
         Windows: output of `"$([Environment]::OSVersion | ForEach-Object VersionString) $(if ([Environment]::Is64BitOperatingSystem) { "x64" } else { "x86" })"` in PowerShell console
     validations:

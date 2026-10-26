@@ -449,14 +449,14 @@ describe('parseQuickConnect', function () {
     assert.strictEqual(result.url, 'https://example.com:8443')
   })
 
-  test('should parse electerm://host/ with trailing slash', () => {
-    const result = parseQuickConnect('electerm://192.168.1.100/')
+  test('should parse electerm-slim://host/ with trailing slash', () => {
+    const result = parseQuickConnect('electerm-slim://192.168.1.100/')
     assert.strictEqual(result.type, 'ssh')
     assert.strictEqual(result.host, '192.168.1.100')
   })
 
-  test('should parse electerm://user@host:port/ with trailing slash', () => {
-    const result = parseQuickConnect('electerm://user@192.168.1.100:22/')
+  test('should parse electerm-slim://user@host:port/ with trailing slash', () => {
+    const result = parseQuickConnect('electerm-slim://user@192.168.1.100:22/')
     assert.strictEqual(result.type, 'ssh')
     assert.strictEqual(result.host, '192.168.1.100')
     assert.strictEqual(result.username, 'user')
@@ -589,27 +589,27 @@ describe('DEFAULT_PORTS', function () {
   })
 
   test('should have electerm default port', () => {
-    assert.strictEqual(DEFAULT_PORTS.electerm, 22)
+    assert.strictEqual(DEFAULT_PORTS['electerm-slim'], 22)
   })
 })
 
-describe('electerm:// protocol', function () {
-  // Test electerm:// with default type (ssh)
-  test('should parse electerm://host (default type ssh)', () => {
-    const result = parseQuickConnect('electerm://192.168.1.100')
+describe('electerm-slim:// protocol', function () {
+  // Test electerm-slim:// with default type (ssh)
+  test('should parse electerm-slim://host (default type ssh)', () => {
+    const result = parseQuickConnect('electerm-slim://192.168.1.100')
     assert.strictEqual(result.type, 'ssh')
     assert.strictEqual(result.host, '192.168.1.100')
   })
 
-  test('should parse electerm://user@host', () => {
-    const result = parseQuickConnect('electerm://user@192.168.1.100')
+  test('should parse electerm-slim://user@host', () => {
+    const result = parseQuickConnect('electerm-slim://user@192.168.1.100')
     assert.strictEqual(result.type, 'ssh')
     assert.strictEqual(result.host, '192.168.1.100')
     assert.strictEqual(result.username, 'user')
   })
 
-  test('should parse electerm://user:password@host:port', () => {
-    const result = parseQuickConnect('electerm://user:password@192.168.1.100:22')
+  test('should parse electerm-slim://user:password@host:port', () => {
+    const result = parseQuickConnect('electerm-slim://user:password@192.168.1.100:22')
     assert.strictEqual(result.type, 'ssh')
     assert.strictEqual(result.host, '192.168.1.100')
     assert.strictEqual(result.port, 22)
@@ -617,91 +617,91 @@ describe('electerm:// protocol', function () {
     assert.strictEqual(result.password, 'password')
   })
 
-  // Test electerm:// with type query param
-  test('should parse electerm://host?type=telnet', () => {
-    const result = parseQuickConnect('electerm://192.168.1.1?type=telnet')
+  // Test electerm-slim:// with type query param
+  test('should parse electerm-slim://host?type=telnet', () => {
+    const result = parseQuickConnect('electerm-slim://192.168.1.1?type=telnet')
     assert.strictEqual(result.type, 'telnet')
     assert.strictEqual(result.host, '192.168.1.1')
   })
 
-  test('should parse electerm://host?type=vnc', () => {
-    const result = parseQuickConnect('electerm://192.168.1.100?type=vnc')
+  test('should parse electerm-slim://host?type=vnc', () => {
+    const result = parseQuickConnect('electerm-slim://192.168.1.100?type=vnc')
     assert.strictEqual(result.type, 'vnc')
     assert.strictEqual(result.host, '192.168.1.100')
   })
 
-  test('should parse electerm://host?type=rdp', () => {
-    const result = parseQuickConnect('electerm://192.168.1.100?type=rdp')
+  test('should parse electerm-slim://host?type=rdp', () => {
+    const result = parseQuickConnect('electerm-slim://192.168.1.100?type=rdp')
     assert.strictEqual(result.type, 'rdp')
     assert.strictEqual(result.host, '192.168.1.100')
   })
 
-  test('should parse electerm://host?type=serial', () => {
-    const result = parseQuickConnect('electerm://COM1?type=serial')
+  test('should parse electerm-slim://host?type=serial', () => {
+    const result = parseQuickConnect('electerm-slim://COM1?type=serial')
     assert.strictEqual(result.type, 'serial')
     assert.strictEqual(result.path, 'COM1')
   })
 
-  test('should parse electerm://host?type=spice', () => {
-    const result = parseQuickConnect('electerm://192.168.1.100?type=spice')
+  test('should parse electerm-slim://host?type=spice', () => {
+    const result = parseQuickConnect('electerm-slim://192.168.1.100?type=spice')
     assert.strictEqual(result.type, 'spice')
     assert.strictEqual(result.host, '192.168.1.100')
   })
 
-  // Test electerm:// with tp query param (alias for type)
-  test('should parse electerm://host?tp=vnc', () => {
-    const result = parseQuickConnect('electerm://192.168.1.100?tp=vnc')
+  // Test electerm-slim:// with tp query param (alias for type)
+  test('should parse electerm-slim://host?tp=vnc', () => {
+    const result = parseQuickConnect('electerm-slim://192.168.1.100?tp=vnc')
     assert.strictEqual(result.type, 'vnc')
     assert.strictEqual(result.host, '192.168.1.100')
   })
 
-  // Test electerm:// with port
-  test('should parse electerm://host:port?type=ssh', () => {
-    const result = parseQuickConnect('electerm://192.168.1.100:2222?type=ssh')
+  // Test electerm-slim:// with port
+  test('should parse electerm-slim://host:port?type=ssh', () => {
+    const result = parseQuickConnect('electerm-slim://192.168.1.100:2222?type=ssh')
     assert.strictEqual(result.type, 'ssh')
     assert.strictEqual(result.host, '192.168.1.100')
     assert.strictEqual(result.port, 2222)
   })
 
-  // Test electerm:// with title query param
-  test('should parse electerm://host?type=ssh&title=MyServer', () => {
-    const result = parseQuickConnect('electerm://192.168.1.100?type=ssh&title=MyServer')
+  // Test electerm-slim:// with title query param
+  test('should parse electerm-slim://host?type=ssh&title=MyServer', () => {
+    const result = parseQuickConnect('electerm-slim://192.168.1.100?type=ssh&title=MyServer')
     assert.strictEqual(result.type, 'ssh')
     assert.strictEqual(result.host, '192.168.1.100')
     assert.strictEqual(result.title, 'MyServer')
   })
 
-  // Test electerm:// with username and type
-  test('should parse electerm://user@host:port?type=telnet', () => {
-    const result = parseQuickConnect('electerm://admin@192.168.1.1:23?type=telnet')
+  // Test electerm-slim:// with username and type
+  test('should parse electerm-slim://user@host:port?type=telnet', () => {
+    const result = parseQuickConnect('electerm-slim://admin@192.168.1.1:23?type=telnet')
     assert.strictEqual(result.type, 'telnet')
     assert.strictEqual(result.host, '192.168.1.1')
     assert.strictEqual(result.port, 23)
     assert.strictEqual(result.username, 'admin')
   })
 
-  // Test electerm:// with web type
-  test('should parse electerm://host?type=https', () => {
-    const result = parseQuickConnect('electerm://example.com?type=https')
+  // Test electerm-slim:// with web type
+  test('should parse electerm-slim://host?type=https', () => {
+    const result = parseQuickConnect('electerm-slim://example.com?type=https')
     assert.strictEqual(result.type, 'web')
     assert.strictEqual(result.url, 'https://example.com')
   })
 
-  test('should parse electerm://host:port?type=http', () => {
-    const result = parseQuickConnect('electerm://example.com:8080?type=http')
+  test('should parse electerm-slim://host:port?type=http', () => {
+    const result = parseQuickConnect('electerm-slim://example.com:8080?type=http')
     assert.strictEqual(result.type, 'web')
     assert.strictEqual(result.url, 'http://example.com:8080')
   })
 
-  // Test electerm:// with invalid type
-  test('should return null for electerm://host?type=invalid', () => {
-    const result = parseQuickConnect('electerm://192.168.1.100?type=invalid')
+  // Test electerm-slim:// with invalid type
+  test('should return null for electerm-slim://host?type=invalid', () => {
+    const result = parseQuickConnect('electerm-slim://192.168.1.100?type=invalid')
     assert.strictEqual(result, null)
   })
 
-  // Test electerm:// with serial baudRate
-  test('should parse electerm://COM1?type=serial&baudRate=115200', () => {
-    const result = parseQuickConnect('electerm://COM1?type=serial&baudRate=115200')
+  // Test electerm-slim:// with serial baudRate
+  test('should parse electerm-slim://COM1?type=serial&baudRate=115200', () => {
+    const result = parseQuickConnect('electerm-slim://COM1?type=serial&baudRate=115200')
     assert.strictEqual(result.type, 'serial')
     assert.strictEqual(result.path, 'COM1')
     assert.strictEqual(result.baudRate, 115200)

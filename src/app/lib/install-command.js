@@ -1,5 +1,5 @@
 /**
- * Install the `electerm` command into PATH.
+ * Install the `electerm_slim` command into PATH.
  *
  * Covered by src/test/unit-ci/install-command.spec.js, which runs with plain
  * `node --test` (no Electron), so this file must NOT require electron at load
@@ -8,11 +8,11 @@
  *
  * Platform behaviour:
  * - macOS: write a one-line `exec` WRAPPER SCRIPT. Never a symlink - see below.
- * - Linux: symlink named `electerm` in the first writable candidate dir.
+ * - Linux: symlink named `electerm_slim` in the first writable candidate dir.
  *   Linux AppImage is special: process.execPath lives inside an ephemeral
  *   squashfs mount, so the symlink points at $APPIMAGE instead.
- * - Windows: append the folder holding electerm.exe to the *user* PATH
- *   (HKCU\Environment) so a newly opened shell resolves `electerm`.
+ * - Windows: append the folder holding electerm_slim.exe to the *user* PATH
+ *   (HKCU\Environment) so a newly opened shell resolves `electerm_slim`.
  *
  * ## Why macOS gets a wrapper and not a symlink
  *
@@ -45,10 +45,9 @@
  *
  * ## The `packaged` guard
  *
- * In an unpackaged run `process.execPath` is the Electron binary, not electerm
- * (measured: `/Users/zxd/dev/electerm/node_modules/electron/dist/Electron.app/
- * Contents/MacOS/Electron`). Installing from there would repoint the user's
- * `electerm` command at bare Electron and break it, so every write is refused
+ * In an unpackaged run `process.execPath` is the Electron binary, not electerm_slim
+ * (for example, `node_modules/electron/dist/Electron.app/Contents/MacOS/Electron`). Installing from there would repoint the user's
+ * `electerm_slim` command at bare Electron and break it, so every write is refused
  * unless `packaged` is true, and `getCommandStatus` reports `unpackaged: true`
  * so the settings row can explain itself instead of offering the buttons. The
  * default is `true` (the packaged app's case); ipc.js passes `app.isPackaged`.
@@ -59,9 +58,9 @@ const os = require('os')
 const path = require('path')
 const { execFile } = require('child_process')
 
-const CMD_NAME = 'electerm'
+const CMD_NAME = 'electerm_slim'
 const POWERSHELL = 'powershell.exe'
-const WRAPPER_MARKER = '# electerm command wrapper'
+const WRAPPER_MARKER = '# electerm_slim command wrapper'
 
 function pathApi (platform) {
   return platform === 'win32' ? path.win32 : path.posix
@@ -171,7 +170,7 @@ function getWrapperContent (target) {
   return [
     '#!/bin/sh',
     WRAPPER_MARKER,
-    '# launch electerm through its real path so it can find its Helper apps',
+    '# launch electerm_slim through its real path so it can find its Helper apps',
     'unset ELECTRON_RUN_AS_NODE',
     `exec ${shQuote(target)} "$@"`,
     ''
@@ -200,11 +199,11 @@ function readHead (file, fsImpl = fs, bytes = 512) {
   }
 }
 
-// Does this link point at an electerm binary? Only the symlink-shape platforms
+// Does this link point at an electerm_slim binary? Only the symlink-shape platforms
 // (linux) ever install one, so a symlink is only ever ours there - on macOS it
 // belongs to somebody else and must be left alone.
 function isElectermLink (link) {
-  return /electerm/i.test(String(link || ''))
+  return /electerm[-_]slim/i.test(String(link || ''))
 }
 
 // `readlinkSync` throws EINVAL when the path exists but is a regular file, so
@@ -452,7 +451,7 @@ async function installCommand (options = {}) {
 
   if (!packaged) {
     // In a dev run process.execPath is the Electron binary, so installing would
-    // repoint the user's `electerm` command at Electron itself and break it.
+    // repoint the user's `electerm_slim` command at Electron itself and break it.
     return {
       platform,
       ok: false,
@@ -461,7 +460,7 @@ async function installCommand (options = {}) {
       linkPath: null,
       target,
       inPath: false,
-      message: 'the electerm command can only be installed from a packaged build'
+      message: 'the electerm_slim command can only be installed from a packaged build'
     }
   }
 
@@ -503,13 +502,13 @@ async function installCommand (options = {}) {
         ...base,
         ok: false,
         action: 'blocked',
-        message: linkPath + ' exists and was not created by electerm'
+        message: linkPath + ' exists and was not created by electerm_slim'
       }
     }
     if (shape === 'wrapper') {
       // Atomic replace via rename: a reader never sees a half-written wrapper,
       // and there is no window where the command does not exist.
-      const tmp = linkPath + '.electerm-tmp'
+      const tmp = linkPath + '.electerm_slim-tmp'
       fsImpl.writeFileSync(tmp, getWrapperContent(target), { mode: 0o755 })
       // writeFileSync's mode is masked by umask, so set the exec bit explicitly
       fsImpl.chmodSync(tmp, 0o755)
@@ -542,7 +541,7 @@ async function uninstallCommand (options = {}) {
       platform,
       ok: false,
       removed: false,
-      message: 'the electerm command can only be changed from a packaged build'
+      message: 'the electerm_slim command can only be changed from a packaged build'
     }
   }
 

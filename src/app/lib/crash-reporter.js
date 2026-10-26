@@ -40,7 +40,7 @@ const GPU_ERROR_SUGGESTION = `
 ⚠️  GPU Process Error Detected
 ================================================================================
 If you encounter GPU process crashes (exit_code=-2147483645 or similar),
-try running electerm with one of these flags:
+try running electerm_slim with one of these flags:
 
   1. --no-sandbox          (Recommended - run without sandbox)
   2. --disable-gpu        (Disable GPU rendering)
@@ -53,9 +53,9 @@ Or set environment variable:
   ENABLE_GPU=1          (Linux only: force-enable hardware GPU)
 
 Example:
-  electerm --no-sandbox
+  electerm_slim --no-sandbox
   or
-  DISABLE_GPU=1 electerm
+  DISABLE_GPU=1 electerm_slim
 ================================================================================
 `
 

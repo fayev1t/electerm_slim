@@ -2,7 +2,7 @@ import React from 'react'
 import { Alert } from 'antd'
 import ExternalLink from '../common/external-link'
 
-const batchOpWikiLink = 'https://github.com/electerm/electerm/wiki/batch-operation'
+const batchOpWikiLink = 'https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md'
 
 export default function BatchOpAlert () {
   const description = (

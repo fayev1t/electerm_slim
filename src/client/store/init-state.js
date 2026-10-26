@@ -240,6 +240,7 @@ export default () => {
     loaddingSerials: false,
 
     appPath: '',
+    dataPath: '',
     exePath: '',
     isPortable: false,
     installSrc: '',

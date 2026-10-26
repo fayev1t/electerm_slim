@@ -55,6 +55,6 @@ export default class TriggerTransport extends BookmarkTransport {
     const { store } = this.props
     const txt = JSON.stringify(store[this.name] || [], null, 2)
     const stamp = time(undefined, 'YYYY-MM-DD-HH-mm-ss')
-    download('electerm-' + this.name + '-' + stamp + '.json', txt)
+    download('electerm_slim-' + this.name + '-' + stamp + '.json', txt)
   }
 }

@@ -4,66 +4,63 @@ const path = require('path')
 // Map to store active terminal processes (pid -> {child, port, ws})
 const activeTerminals = new Map()
 
-// Track the last port assigned
-let lastPort = 30975
-const MIN_PORT = 30975
-const MAX_PORT = 65534
-// Add a set to track ports that are currently being assigned
-const pendingPorts = new Set()
-
-function getPort (fromPort = MIN_PORT) {
-  // Use the last port + 1 or start over if we've reached MAX_PORT
-  let startPort = lastPort >= MAX_PORT ? MIN_PORT : lastPort + 1
-
-  // Skip ports that are currently being assigned
-  while (pendingPorts.has(startPort)) {
-    startPort = startPort >= MAX_PORT ? MIN_PORT : startPort + 1
-  }
-
-  // Mark this port as pending
-  pendingPorts.add(startPort)
-
+function runSessionServer (type) {
   return new Promise((resolve, reject) => {
-    require('find-free-port')(startPort, '127.0.0.1', function (err, freePort) {
-      if (err) {
-        // Remove from pending set on error
-        pendingPorts.delete(startPort)
-        reject(err)
-      } else {
-        // Remember this port for next time
-        lastPort = freePort
-        // Remove from pending set when done
-        pendingPorts.delete(startPort)
-        resolve(freePort)
-      }
-    })
-  })
-}
-
-async function runSessionServer (type, port) {
-  return new Promise((resolve) => {
     const cleanEnv = Object.assign({}, process.env)
     delete cleanEnv.ELECTRON_RUN_AS_NODE
     const child = fork(path.resolve(__dirname, './session-server.js'), {
-      env: Object.assign(
-        {
-          wsPort: port,
-          type
-        },
-        cleanEnv
-      ),
+      env: {
+        ...cleanEnv,
+        // Bind once in the child and let the OS assign the port. A failed
+        // TCP probe does not mean Windows will allow listening on that port.
+        wsPort: '0',
+        type
+      },
       cwd: process.cwd()
-    }, (error, stdout, stderr) => {
-      if (error || stderr) {
-        console.error('Error in session server:', error || stderr)
-        throw error || stderr
-      }
     })
-    child.on('message', (m) => {
-      if (m && m.serverInited) {
-        resolve(child)
+    const timer = setTimeout(() => {
+      fail(new Error('Session server did not start within 30000ms'))
+    }, 30000)
+
+    function cleanup () {
+      clearTimeout(timer)
+      child.removeListener('message', onMessage)
+      child.removeListener('error', fail)
+      child.removeListener('exit', onExit)
+    }
+
+    function fail (err) {
+      cleanup()
+      child.kill()
+      reject(err)
+    }
+
+    function onExit (code, signal) {
+      fail(new Error(`Session server exited before starting (${signal || code})`))
+    }
+
+    function onMessage (message) {
+      if (message?.serverError) {
+        fail(Object.assign(new Error(message.serverError.message), {
+          code: message.serverError.code
+        }))
+        return
       }
-    })
+      if (!message?.serverInited) {
+        return
+      }
+      const port = Number(message.port)
+      if (!Number.isInteger(port) || port < 1 || port > 65535) {
+        fail(new Error('Session server did not report a valid listening port'))
+        return
+      }
+      cleanup()
+      resolve({ child, port })
+    }
+
+    child.on('message', onMessage)
+    child.once('error', fail)
+    child.once('exit', onExit)
   })
 }
 
@@ -138,6 +135,10 @@ async function sendMsgToChildProcess (pid, msg, timeoutMs = 0) {
       child.send({
         type: 'common',
         data: msg
+      }, (err) => {
+        if (err) {
+          doReject(err)
+        }
       })
     } catch (err) {
       doReject(err)
@@ -171,8 +172,7 @@ function onChildExit (child) {
 
 exports.terminal = async function (initOptions, ws, uid) {
   const type = initOptions.termType || initOptions.type || 'terminal'
-  const port = await getPort()
-  const child = await runSessionServer(type, port)
+  const { child, port } = await runSessionServer(type)
   const pid = initOptions.uid
   const isSsh = ![
     'telnet',
@@ -196,7 +196,9 @@ exports.terminal = async function (initOptions, ws, uid) {
   }
   child.on('exit', () => {
     onChildExit(child)
-    activeTerminals.delete(pid)
+    if (activeTerminals.get(pid)?.child === child) {
+      activeTerminals.delete(pid)
+    }
   })
   if (type !== 'ftp') {
     try {
@@ -234,8 +236,8 @@ exports.terminal = async function (initOptions, ws, uid) {
 
 exports.testConnection = async function (initOptions, ws, uid) {
   const type = initOptions.termType || initOptions.type || 'terminal'
-  const port = await getPort()
-  const child = await runSessionServer(type, port)
+  const { child } = await runSessionServer(type)
+  child.once('exit', () => onChildExit(child))
 
   const isSsh = ![
     'telnet',
@@ -258,14 +260,15 @@ exports.testConnection = async function (initOptions, ws, uid) {
     })
   }
 
-  const res = await sendMsgToChildProcess(child, {
-    id: uid,
-    action: 'test-terminal',
-    body: initOptions
-  }, 60000)
-
-  child.kill()
-  return res
+  try {
+    return await sendMsgToChildProcess(child, {
+      id: uid,
+      action: 'test-terminal',
+      body: initOptions
+    }, 60000)
+  } finally {
+    child.kill()
+  }
 }
 
 /**

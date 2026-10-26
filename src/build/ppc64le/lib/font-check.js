@@ -45,7 +45,7 @@ const PROBE_JS = `(() => {
   return c.measureText('mmmmmmmmmmlli').width > 0
 })()`
 
-// electerm ships @fontsource/maple-mono inside app.asar, so this one is
+// electerm_slim ships @fontsource/maple-mono inside app.asar, so this one is
 // always available, whatever the state of the system fonts.
 const FALLBACK_FONT = 'Maple Mono'
 

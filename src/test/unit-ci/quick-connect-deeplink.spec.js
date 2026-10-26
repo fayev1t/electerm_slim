@@ -1,6 +1,6 @@
 /**
  * Deep link / quick connect input is untrusted: it arrives from a clicked
- * electerm:// or ssh:// link, from argv, or from a shortcut file, and parsing
+ * electerm-slim:// or ssh:// link, from argv, or from a shortcut file, and parsing
  * must not let it set any field that reaches a process spawn, a shell, the
  * process environment or the terminal input stream.
  *
@@ -34,7 +34,7 @@ const {
 } = require('../../app/common/parse-quick-connect')
 
 const withOpts = opts =>
-  'electerm://127.0.0.1:2222?opts=' + JSON.stringify(opts)
+  'electerm-slim://127.0.0.1:2222?opts=' + JSON.stringify(opts)
 
 // every session field known to reach child_process.spawn / a shell / env / tty
 const EXEC_FIELDS = [

@@ -4,10 +4,11 @@
  * Accepts appPath and defaultUserName as parameters to avoid electron dependency
  */
 
-const { resolve } = require('path')
 const fs = require('fs')
+const { resolve } = require('path')
 const uid = require('../common/uid')
 const { DatabaseSync } = require('node:sqlite')
+const { getProfilePaths } = require('../common/data-paths')
 
 // Tables whose stored data values should be encrypted at rest
 const ENC_TABLES = new Set(['bookmarks', 'profiles', 'data', 'history', 'terminalCommandHistory', 'aiChatHistory'])
@@ -19,20 +20,17 @@ const DATA_ENC_ID = 'userConfig'
 const ENC_PREFIX = 'enc:'
 
 function createDb (appPath, defaultUserName, { enc, dec } = {}) {
-  const appDataPath = process.env.DATA_PATH || resolve(appPath, 'electerm')
+  const { dataPath: appDataPath, profilePath: dbFolder, mainDbPath, dataDbPath } = getProfilePaths(appPath, defaultUserName)
 
   if (!fs.existsSync(appDataPath)) {
-    fs.mkdirSync(appDataPath, { recursive: true })
+    fs.mkdirSync(appDataPath, { recursive: true, mode: 0o700 })
   }
 
   // Define database folder and paths for two database files
-  const dbFolder = resolve(appDataPath, 'users', defaultUserName)
-  const mainDbPath = resolve(dbFolder, 'electerm.db')
-  const dataDbPath = resolve(dbFolder, 'electerm_data.db')
 
   // Ensure parent directory exists
   if (!fs.existsSync(dbFolder)) {
-    fs.mkdirSync(dbFolder, { recursive: true })
+    fs.mkdirSync(dbFolder, { recursive: true, mode: 0o700 })
   }
   // Create two database instances
   const mainDb = new DatabaseSync(mainDbPath)
@@ -188,9 +186,63 @@ function createDb (appPath, defaultUserName, { enc, dec } = {}) {
     }
   }
 
+  function importRecords (records, backupRoot) {
+    for (const [table, docs] of Object.entries(records)) {
+      if (!tables.includes(table) || !Array.isArray(docs) || docs.some(doc => !doc || typeof doc._id !== 'string')) {
+        throw new Error('Invalid import records')
+      }
+    }
+    const backupPath = resolve(backupRoot, `electerm-import-${Date.now()}-${uid()}`)
+    fs.mkdirSync(backupPath, { recursive: true, mode: 0o700 })
+    // VACUUM INTO captures committed data, including any WAL content.
+    mainDb.prepare('VACUUM INTO ?').run(resolve(backupPath, 'electerm_slim.db'))
+    dataDb.prepare('VACUUM INTO ?').run(resolve(backupPath, 'electerm_slim_data.db'))
+    const keyPath = resolve(dbFolder, 'storage-key.enc')
+    if (fs.existsSync(keyPath)) fs.copyFileSync(keyPath, resolve(backupPath, 'storage-key.enc'))
+    const counts = {}
+    mainDb.prepare('ATTACH DATABASE ? AS import_config').run(dataDbPath)
+    let transaction = false
+    try {
+      mainDb.exec('BEGIN IMMEDIATE')
+      transaction = true
+      for (const [table, docs] of Object.entries(records)) {
+        const schema = table === 'data' ? 'import_config' : 'main'
+        const insert = mainDb.prepare(`INSERT OR REPLACE INTO ${schema}."${table}" (_id, data) VALUES (?, ?)`)
+        for (let doc of docs) {
+          // Shared groups and ordering records keep references to local items.
+          if (table === 'bookmarkGroups') {
+            const previous = toDoc(mainDb.prepare('SELECT * FROM bookmarkGroups WHERE _id = ?').get(doc._id), table)
+            for (const key of ['bookmarkIds', 'bookmarkGroupIds']) {
+              doc = { ...doc, [key]: [...new Set([...(previous?.[key] || []), ...(doc[key] || [])])] }
+            }
+          } else if (table === 'data' && doc._id.endsWith(':order') && Array.isArray(doc.value)) {
+            const previous = toDoc(dataDb.prepare('SELECT * FROM data WHERE _id = ?').get(doc._id), table)
+            doc = { ...doc, value: [...new Set([...doc.value, ...(previous?.value || [])])] }
+          }
+          const row = toRow(doc, table)
+          insert.run(row._id, row.data)
+        }
+        counts[table] = docs.length
+      }
+      mainDb.exec('COMMIT')
+      transaction = false
+    } catch (error) {
+      if (transaction) mainDb.exec('ROLLBACK')
+      throw error
+    } finally {
+      mainDb.exec('DETACH DATABASE import_config')
+    }
+    return { backupPath, counts }
+  }
+
   return {
     dbAction,
-    tables
+    tables,
+    importRecords,
+    close: () => {
+      mainDb.close()
+      dataDb.close()
+    }
   }
 }
 

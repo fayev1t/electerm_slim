@@ -70,7 +70,7 @@ const fix = require(join(__dirname, 'lib', 'font-conf-fix.js'))
 
 // ---------------------------------------------------------------- helpers
 const resourcesDir = fs.mkdtempSync(join(os.tmpdir(), 'ppc64le-font-'))
-const bundledConf = join(resourcesDir, 'electerm-fonts.conf')
+const bundledConf = join(resourcesDir, 'electerm-slim-fonts.conf')
 fs.writeFileSync(bundledConf, '<fontconfig/>')
 
 const ZERO_FONTS = {

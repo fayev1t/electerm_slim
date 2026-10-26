@@ -17,7 +17,7 @@ const { parseQuickConnect } = require('../common/parse-quick-connect')
  * the handler for every clicked web link, hijacking the user's default browser.
  * They remain parseable via quick-connect (normalized to type "web").
  */
-const DEEP_LINK_PROTOCOLS = ['ssh', 'telnet', 'vnc', 'rdp', 'spice', 'serial', 'ftp', 'electerm']
+const DEEP_LINK_PROTOCOLS = ['ssh', 'telnet', 'vnc', 'rdp', 'spice', 'serial', 'ftp', 'electerm-slim']
 
 /**
  * Register electerm as a handler for supported protocols

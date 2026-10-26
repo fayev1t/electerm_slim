@@ -33,7 +33,7 @@ export default function NoSessionPanel ({ height, onNewTab, onNewSsh, batch }) {
       )
     : null
   return (
-    <div className='no-sessions electerm-logo-bg' {...props}>
+    <div className='no-sessions electerm_slim-logo-bg' {...props}>
       <div className='no-session-btns'>
         {newTabDom}
         <Button

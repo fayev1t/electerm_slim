@@ -12,23 +12,13 @@ import multer from 'multer'
 const devPort = env.DEV_PORT || 5570
 const host = env.DEV_HOST || '127.0.0.1'
 const h = `http://${host}:${devPort}`
-const defaultAIPreset = {
-  baseURLAI: 'https://ai.electerm.org/api/ai',
-  apiPathAI: '/chat/completions',
-  modelAI: 'free',
-  authHeaderNameAI: 'Authorization: Bearer',
-  id: 'ai.electerm.org',
-  nameAI: 'ai.electerm.org',
-  siteUrl: 'https://ai.electerm.org?utm=electerm'
-}
 
 // const AIDisclamer = 'AI-generated terminal commands can be inaccurate or unsafe, be careful'
 
 const base = {
   version: pack.version,
   isDev: !isProd,
-  siteName: pack.name,
-  defaultAIPreset
+  siteName: pack.name
 }
 
 function handleIndex (req, res) {
@@ -44,7 +34,7 @@ function redirect (req, res) {
     name
   } = req.params
   const mapper = {
-    electerm: '/src/client/entry/electerm.jsx',
+    electerm_slim: '/src/client/entry/electerm-slim.jsx',
     worker: '/src/client/entry/worker.js'
   }
   res.redirect(mapper[name])

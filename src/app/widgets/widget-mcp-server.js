@@ -1,6 +1,6 @@
 /**
  * MCP Server Widget
- * Exposes electerm store APIs via Model Context Protocol
+ * Exposes electerm_slim store APIs via Model Context Protocol
  * Runs in main process and uses IPC to communicate with frontend
  * Uses a simple local MCP implementation
  */
@@ -68,7 +68,7 @@ function sanitizeTabArgs (args) {
 
 const widgetInfo = {
   name: 'MCP Server',
-  description: 'Expose electerm APIs via Model Context Protocol (MCP) for AI assistants and external tools.',
+  description: 'Expose electerm_slim APIs via Model Context Protocol (MCP) for AI assistants and external tools.',
   version: '1.0.0',
   author: 'ZHAO Xudong',
   type: 'instance',
@@ -396,7 +396,7 @@ class ElectermMCPServer {
     server.registerTool(
       'list_electerm_tabs',
       {
-        description: 'List all open electerm terminal tabs',
+        description: 'List all open electerm_slim terminal tabs',
         inputSchema: z.object({})
       },
       async () => {
@@ -408,7 +408,7 @@ class ElectermMCPServer {
     server.registerTool(
       'get_electerm_active_tab',
       {
-        description: 'Get the currently active electerm tab',
+        description: 'Get the currently active electerm_slim tab',
         inputSchema: z.object({})
       },
       async () => {
@@ -420,7 +420,7 @@ class ElectermMCPServer {
     server.registerTool(
       'switch_electerm_tab',
       {
-        description: 'Switch to a specific electerm tab',
+        description: 'Switch to a specific electerm_slim tab',
         inputSchema: {
           tabId: z.string().describe('Tab ID to switch to')
         }
@@ -434,7 +434,7 @@ class ElectermMCPServer {
     server.registerTool(
       'close_electerm_tab',
       {
-        description: 'Close a specific electerm tab',
+        description: 'Close a specific electerm_slim tab',
         inputSchema: {
           tabId: z.string().describe('Tab ID to close')
         }
@@ -448,7 +448,7 @@ class ElectermMCPServer {
     server.registerTool(
       'reload_electerm_tab',
       {
-        description: 'Reload/reconnect an electerm tab',
+        description: 'Reload/reconnect an electerm_slim tab',
         inputSchema: {
           tabId: z.string().optional().describe('Tab ID to reload (default: active tab)')
         }
@@ -463,7 +463,7 @@ class ElectermMCPServer {
     server.registerTool(
       'duplicate_electerm_tab',
       {
-        description: 'Duplicate an electerm tab',
+        description: 'Duplicate an electerm_slim tab',
         inputSchema: {
           tabId: z.string().describe('Tab ID to duplicate')
         }
@@ -477,7 +477,7 @@ class ElectermMCPServer {
     server.registerTool(
       'open_electerm_local_terminal',
       {
-        description: 'Open a new electerm local terminal tab',
+        description: 'Open a new electerm_slim local terminal tab',
         inputSchema: z.object({})
       },
       async () => {
@@ -489,7 +489,7 @@ class ElectermMCPServer {
     server.registerTool(
       'send_electerm_terminal_command',
       {
-        description: 'Send a command to the active electerm terminal. For non-interactive commands, prefer execute_electerm_command — it returns structured stdout/stderr/exitCode in one call instead of requiring send + wait + read.',
+        description: 'Send a command to the active electerm_slim terminal. For non-interactive commands, prefer execute_electerm_command — it returns structured stdout/stderr/exitCode in one call instead of requiring send + wait + read.',
         inputSchema: {
           command: z.string().describe('Command to send'),
           tabId: z.string().optional().describe('Optional: specific tab ID'),
@@ -512,7 +512,7 @@ class ElectermMCPServer {
     server.registerTool(
       'get_electerm_terminal_selection',
       {
-        description: 'Get the current text selection in electerm terminal',
+        description: 'Get the current text selection in electerm_slim terminal',
         inputSchema: {
           tabId: z.string().optional().describe('Optional: specific tab ID')
         }
@@ -527,7 +527,7 @@ class ElectermMCPServer {
     server.registerTool(
       'get_electerm_terminal_output',
       {
-        description: 'Get recent electerm terminal output/buffer content',
+        description: 'Get recent electerm_slim terminal output/buffer content',
         inputSchema: {
           tabId: z.string().optional().describe('Optional: specific tab ID'),
           lines: z.number().optional().describe('Number of lines to return (default: 50)')
@@ -588,7 +588,7 @@ class ElectermMCPServer {
       'set_electerm_terminal_keepalive',
       {
         description: 'Turn session keepalive on or off for a terminal session. ' +
-          'While on, electerm writes a newline to the session whenever it has been idle, resetting shell idle timeouts so the connection is not killed. ' +
+          'While on, electerm_slim writes a newline to the session whenever it has been idle, resetting shell idle timeouts so the connection is not killed. ' +
           'Use it before long work on a session nobody is typing into, e.g. a large electerm_sftp_upload / electerm_sftp_download. ' +
           'Returns the resulting state as `keepalive`.',
         inputSchema: {
@@ -766,7 +766,7 @@ class ElectermMCPServer {
       server.registerTool(
         'list_electerm_bookmarks',
         {
-          description: 'List all electerm SSH/terminal bookmarks',
+          description: 'List all electerm_slim SSH/terminal bookmarks',
           inputSchema: {}
         },
         async (args) => {
@@ -783,7 +783,7 @@ class ElectermMCPServer {
       server.registerTool(
         'get_electerm_bookmark',
         {
-          description: 'Get a specific electerm bookmark by ID',
+          description: 'Get a specific electerm_slim bookmark by ID',
           inputSchema: {
             id: z.string().describe('Bookmark ID')
           }
@@ -797,7 +797,7 @@ class ElectermMCPServer {
       server.registerTool(
         'add_electerm_bookmark_ssh',
         {
-          description: 'Add a new SSH bookmark to electerm',
+          description: 'Add a new SSH bookmark to electerm_slim',
           inputSchema: sshBookmarkSchema
         },
         async (args) => {
@@ -812,7 +812,7 @@ class ElectermMCPServer {
       server.registerTool(
         'add_electerm_bookmark_telnet',
         {
-          description: 'Add a new Telnet bookmark to electerm',
+          description: 'Add a new Telnet bookmark to electerm_slim',
           inputSchema: telnetBookmarkSchema
         },
         async (args) => {
@@ -827,7 +827,7 @@ class ElectermMCPServer {
       server.registerTool(
         'add_electerm_bookmark_serial',
         {
-          description: 'Add a new Serial bookmark to electerm',
+          description: 'Add a new Serial bookmark to electerm_slim',
           inputSchema: serialBookmarkSchema
         },
         async (args) => {
@@ -842,7 +842,7 @@ class ElectermMCPServer {
       server.registerTool(
         'add_electerm_bookmark_local',
         {
-          description: 'Add a new Local terminal bookmark to electerm',
+          description: 'Add a new Local terminal bookmark to electerm_slim',
           inputSchema: localBookmarkSchema
         },
         async (args) => {
@@ -857,7 +857,7 @@ class ElectermMCPServer {
       server.registerTool(
         'edit_electerm_bookmark',
         {
-          description: 'Edit an existing electerm bookmark',
+          description: 'Edit an existing electerm_slim bookmark',
           inputSchema: {
             id: z.string().describe('Bookmark ID to edit'),
             updates: z.record(z.any()).describe('Fields to update')
@@ -872,7 +872,7 @@ class ElectermMCPServer {
       server.registerTool(
         'delete_electerm_bookmark',
         {
-          description: 'Delete an electerm bookmark',
+          description: 'Delete an electerm_slim bookmark',
           inputSchema: {
             id: z.string().describe('Bookmark ID to delete')
           }
@@ -886,7 +886,7 @@ class ElectermMCPServer {
       server.registerTool(
         'open_electerm_bookmark',
         {
-          description: 'Open an electerm bookmark in a new tab',
+          description: 'Open an electerm_slim bookmark in a new tab',
           inputSchema: {
             id: z.string().describe('Bookmark ID to open')
           }
@@ -903,7 +903,7 @@ class ElectermMCPServer {
       server.registerTool(
         'list_electerm_bookmark_groups',
         {
-          description: 'List all electerm bookmark groups/folders',
+          description: 'List all electerm_slim bookmark groups/folders',
           inputSchema: z.object({})
         },
         async () => {
@@ -915,7 +915,7 @@ class ElectermMCPServer {
       server.registerTool(
         'add_electerm_bookmark_group',
         {
-          description: 'Add a new electerm bookmark group',
+          description: 'Add a new electerm_slim bookmark group',
           inputSchema: {
             title: z.string().describe('Group title'),
             parentId: z.string().optional().describe('Optional parent group ID')
@@ -1087,7 +1087,7 @@ class ElectermMCPServer {
       server.registerTool(
         'get_electerm_settings',
         {
-          description: 'Get current electerm application settings',
+          description: 'Get current electerm_slim application settings',
           inputSchema: undefined
         },
         async () => {
@@ -1130,7 +1130,7 @@ class ElectermMCPServer {
 
     // Create MCP server
     this.mcpServer = new McpServer({
-      name: 'electerm-mcp-server',
+      name: 'electerm_slim-mcp-server',
       version: widgetInfo.version,
       taskManager: this.taskManager
     })

@@ -6,6 +6,7 @@ html
     meta(http-equiv='x-ua-compatible' content='IE=edge')
     meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
     title #{siteName}
+    link(rel='icon', href='images/electerm_slim-icon.png')
     style.
       body {
         background: #000;
@@ -21,11 +22,10 @@ html
         justify-content: center;
         align-items: center;
       }
-      .electerm-logo-bg {
-        background: transparent 50% 50% no-repeat url("./images/electerm-watermark.png");
-        /* the watermark is 766 x 266; without a size it is cropped on narrow
-           panes (mobile), so scale it down to fit the pane width instead */
-        background-size: min(100%, 766px) auto;
+      .electerm_slim-logo-bg {
+        background: transparent 50% 50% no-repeat url("./images/electerm_slim-wordmark.png");
+        /* Keep the wordmark inside narrow panes. */
+        background-size: min(80%, 600px) auto;
       }
       .morph-shape {
         background: linear-gradient(45deg, #08c 0%, #09c 100%);
@@ -41,7 +41,7 @@ html
       //- basic.js has run. basic.js injects the <script> dynamically, so without
       //- this hint the request only goes out ~130ms later -- and the bundle's
       //- ~190 static chunk imports are not even discovered until it arrives.
-      link(rel='modulepreload', href='js/electerm-' + version + '.js')
+      link(rel='modulepreload', href='js/electerm_slim-' + version + '.js')
       each c in preloadChunks
         link(rel='modulepreload', href=c)
       style(id='theme-css').
@@ -53,7 +53,7 @@ html
     #container
     #content-loading
       .morph-shape.iblock.pd3
-        img.iblock.logo-filter(src='images/electerm.png', alt='', height=80)
+        img.iblock(src='images/electerm_slim-icon.png', alt='electerm_slim', height=80)
     script.
       window.et = !{JSON.stringify(_global)}
     - var url = '/src/client/entry/basic.js'

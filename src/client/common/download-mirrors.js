@@ -1,6 +1,8 @@
+import { packInfo } from './constants'
+
 export default [
   {
-    name: 'homepage',
-    url: 'https://electerm.org'
+    name: 'GitHub Releases',
+    url: packInfo.releases
   }
 ]

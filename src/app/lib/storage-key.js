@@ -1,12 +1,11 @@
 const log = require('../common/log')
 const { appPath, defaultUserName } = require('../common/app-props')
 const { safeEncrypt, safeDecrypt } = require('./safe-storage')
-const { resolve: pathResolve } = require('path')
 const fs = require('fs')
 const { randomBytes } = require('crypto')
+const { getProfilePaths } = require('../common/data-paths')
 
-const appDataPath = process.env.DATA_PATH || pathResolve(appPath, 'electerm')
-const keyFilePath = pathResolve(appDataPath, 'users', defaultUserName, 'storage-key.enc')
+const { profilePath, storageKeyPath: keyFilePath } = getProfilePaths(appPath, defaultUserName)
 
 let _cachedStorageKey = null
 
@@ -29,7 +28,7 @@ function getStorageKey () {
   if (!key) {
     key = randomBytes(32).toString('base64')
     try {
-      const dir = pathResolve(appDataPath, 'users', defaultUserName)
+      const dir = profilePath
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true })
       }

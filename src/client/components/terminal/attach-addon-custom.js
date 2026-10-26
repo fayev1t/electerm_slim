@@ -96,7 +96,7 @@ function startAfterPartialAnsi (str, start) {
 
 function truncationMarker (dropped) {
   const kb = Math.round(dropped / 1024)
-  return `\r\n...[electerm] output truncated, ${kb}K skipped...\r\n`
+  return `\r\n...[electerm_slim] output truncated, ${kb}K skipped...\r\n`
 }
 
 export function truncateTerminalOutput (str, maxChars) {

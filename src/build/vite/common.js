@@ -17,11 +17,7 @@ export const staticPaths = [
     path: '/icons'
   },
   {
-    dir: resolve(cwd, '../../../node_modules/@electerm/electerm-resource/tray-icons'),
-    path: '/images'
-  },
-  {
-    dir: resolve(cwd, '../../../node_modules/@electerm/electerm-resource/res/imgs'),
+    dir: resolve(cwd, '../../../src/assets/branding/images'),
     path: '/images'
   },
   {

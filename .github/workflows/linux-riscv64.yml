@@ -1,4 +1,4 @@
-# Build electerm for riscv64 Linux
+# Build electerm_slim for riscv64 Linux
 #
 # This workflow:
 # 1. Builds x64 version with electron v42.8.1 to get the asar
@@ -55,9 +55,9 @@ jobs:
     - name: Verify output
       run: |
         ls -la dist-riscv64/*.tar.gz dist-riscv64/*.deb
-        file dist-riscv64/electerm-*/electerm
+        file dist-riscv64/electerm_slim-*/electerm-slim
         # every ELF outside prebuilds/ must be riscv64
-        bad=$(find dist-riscv64/electerm-* -name "*.node" -not -path "*/prebuilds/*" \
+        bad=$(find dist-riscv64/electerm_slim-* -name "*.node" -not -path "*/prebuilds/*" \
           -exec sh -c 'file "$1" | grep -q "RISC-V" || echo "$1"' _ {} \;)
         if [ -n "$bad" ]; then
           echo "Non riscv64 binaries found:"

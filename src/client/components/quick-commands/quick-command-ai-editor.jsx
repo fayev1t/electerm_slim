@@ -30,7 +30,7 @@ const maxNameLength = 60
 const { TextArea } = Input
 const e = window.translate
 
-const wiki = 'https://github.com/electerm/electerm/wiki/Create-quick-command-by-AI'
+const wiki = 'https://github.com/fayev1t/electerm_slim_slim/blob/master/src/docs/usage.md'
 
 /**
  * build the prompt that asks the AI for one quick command definition
@@ -40,7 +40,7 @@ const wiki = 'https://github.com/electerm/electerm/wiki/Create-quick-command-by-
 export function buildPrompt (description) {
   const lang = window.store.config.languageAI || window.store.getLangName()
   const templateList = templates.map(t => `{{${t}}}`).join(', ')
-  return `You are an electerm quick command generator. Based on the user's natural language description, generate ONE quick command definition in JSON format.
+  return `You are an electerm_slim quick command generator. Based on the user's natural language description, generate ONE quick command definition in JSON format.
 
 The quick command JSON shape:
 {
@@ -175,7 +175,7 @@ export default function QuickCommandAiEditor (props) {
         'AIchat',
         buildPrompt(description),
         config.modelAI,
-        appendMandatoryGuardrails('You are a helpful assistant that generates electerm quick commands.'),
+        appendMandatoryGuardrails('You are a helpful assistant that generates electerm_slim quick commands.'),
         config.baseURLAI,
         config.apiPathAI,
         config.apiKeyAI,

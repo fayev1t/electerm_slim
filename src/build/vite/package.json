@@ -1,5 +1,5 @@
 {
-  "name": "electerm",
+  "name": "electerm_slim-vite",
   "version": "1.29.5",
   "main": "app.js",
   "type": "module",

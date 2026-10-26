@@ -1,16 +1,23 @@
-.logo-img
-  height 80px
-.logo-img-small
-  height 28px
-  border-radius 28px
-// the h1 vertical margin so the logo stops dominating the no-session panel.
+.logo-elem
+  display flex
+  justify-content center
+  align-items center
+  flex-wrap wrap
+  gap 12px
+  .logo-img
+    width 64px
+    height 64px
+  .logo-name
+    font-size 36px
+    letter-spacing -1.5px
+    color var(--text)
 .is-mobile
   .logo-elem
     margin-top 8px
     margin-bottom 8px
-  .morph-shape
-    padding 6px
-  .logo-img
-    height 32px
-  .logo-img-small
-    height 20px
+    gap 8px
+    .logo-img
+      width 36px
+      height 36px
+    .logo-name
+      font-size 24px

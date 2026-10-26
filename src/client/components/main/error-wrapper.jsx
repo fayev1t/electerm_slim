@@ -9,40 +9,38 @@ import {
 } from '../../common/constants'
 import Link from '../common/external-link'
 import { copy } from '../../common/clipboard'
-import compare from '../../common/version-compare'
 
 const e = window.translate
-const version = packInfo.version
 const os = isMac ? 'mac' : isWin ? 'windows' : 'linux'
-const isVersion2OrAbove = compare(version, '2.0.0') >= 0
+const isVersion2OrAbove = Number((window.pre.versions?.node || '24').split('.')[0]) >= 22
 
 const userDataPath = {
-  mac: '~/Library/Application\\ Support/electerm/users/default_user',
-  linux: '~/.config/electerm/users/default_user',
-  windows: 'C:\\Users\\your-user-name\\AppData\\Roaming\\electerm\\users\\default_user'
+  mac: '~/Library/Application\\ Support/electerm_slim/users/default_user',
+  linux: '~/.config/electerm_slim/users/default_user',
+  windows: 'C:\\Users\\your-user-name\\AppData\\Roaming\\electerm_slim\\users\\default_user'
 }
 
 const troubleshootContent = {
   runInCommandLine: {
-    mac: '/Applications/electerm.app/Contents/MacOS/electerm',
-    linux: 'path/to/electerm',
-    windows: 'path\\to\\electerm.exe'
+    mac: '/Applications/electerm_slim.app/Contents/MacOS/electerm_slim',
+    linux: 'path/to/electerm-slim',
+    windows: 'path\\to\\electerm_slim.exe'
   },
   clearConfig: {
     mac: isVersion2OrAbove
-      ? `rm -rf ${userDataPath.mac}/electerm_data.db`
-      : `rm -rf ${userDataPath.mac}/electerm.data.nedb`,
+      ? `rm -rf ${userDataPath.mac}/electerm_slim_data.db`
+      : `rm -rf ${userDataPath.mac}/electerm_slim.data.nedb`,
     linux: isVersion2OrAbove
-      ? `rm -rf ${userDataPath.linux}/electerm_data.db`
-      : `rm -rf ${userDataPath.linux}/electerm.data.nedb`,
+      ? `rm -rf ${userDataPath.linux}/electerm_slim_data.db`
+      : `rm -rf ${userDataPath.linux}/electerm_slim.data.nedb`,
     windows: isVersion2OrAbove
-      ? `Delete ${userDataPath.windows}\\electerm_data.db`
-      : `Delete ${userDataPath.windows}\\electerm.data.nedb`
+      ? `Delete ${userDataPath.windows}\\electerm_slim_data.db`
+      : `Delete ${userDataPath.windows}\\electerm_slim.data.nedb`
   },
   backupData: {
-    mac: `cp -r ${userDataPath.mac} ~/Desktop/electerm_backup_${Date.now()}`,
-    linux: `cp -r ${userDataPath.linux} ~/Desktop/electerm_backup_${Date.now()}`,
-    windows: `xcopy "${userDataPath.windows}\\*" "%USERPROFILE%\\Desktop\\electerm_backup_${Date.now()}" /E /I`
+    mac: `cp -r ${userDataPath.mac} ~/Desktop/electerm_slim_backup_${Date.now()}`,
+    linux: `cp -r ${userDataPath.linux} ~/Desktop/electerm_slim_backup_${Date.now()}`,
+    windows: `xcopy "${userDataPath.windows}\\*" "%USERPROFILE%\\Desktop\\electerm_slim_backup_${Date.now()}" /E /I`
   }
 }
 
@@ -83,7 +81,7 @@ export default class ErrorBoundary extends React.PureComponent {
     return (
       <div className='pd1y wordbreak'>
         <h2>{e('troubleShoot')}</h2>
-        <p>Electerm Version: {packInfo.version}, OS: {os}</p>
+        <p>electerm_slim Version: {packInfo.version}, OS: {os}</p>
         {
           Object.keys(troubleshootContent).map((k, i) => {
             const v = troubleshootContent[k]
@@ -112,17 +110,6 @@ export default class ErrorBoundary extends React.PureComponent {
       <>
         <div className='pd1b'>
           <Link to={bugUrl}>{e('bugReport')}</Link>
-        </div>
-        <div className='pd1b'>
-          <span>Contact author: </span>
-          <Link to='mailto:zxdong@gmail.com'>zxdong@gmail.com</Link>
-        </div>
-        <div className='pd3y'>
-          <img
-            src='https://electerm.org/electerm-wechat-group-qr.jpg'
-            className='mwm-100'
-            width={200}
-          />
         </div>
       </>
     )

@@ -6,7 +6,7 @@ export const defaultAIPresets = [
     apiPathAI: '/chat/completions',
     modelAI: 'deepseek-flash',
     authHeaderNameAI: 'Authorization: Bearer',
-    siteUrl: 'https://www.packyapi.ai/register?aff=DOZI',
+    siteUrl: 'https://www.packyapi.ai/register',
     modelAIs: [
       { value: 'deepseek-flash' },
       { value: 'deepseek-v4-pro' }
@@ -19,7 +19,7 @@ export const defaultAIPresets = [
     apiPathAI: '/chat/completions',
     modelAI: 'deepseek-v4-flash-0731',
     authHeaderNameAI: 'Authorization: Bearer',
-    siteUrl: 'https://fluxionai.space/register?source=github&campaign=github-sidrune-electerm&promo=SDRELECTERM&aff=7H7DERHU3GFF'
+    siteUrl: 'https://fluxionai.space/register'
   },
   {
     id: 'atlascloud',
@@ -28,7 +28,7 @@ export const defaultAIPresets = [
     apiPathAI: '/chat/completions',
     modelAI: 'deepseek-ai/deepseek-v4-flash',
     authHeaderNameAI: 'Authorization: Bearer',
-    siteUrl: 'https://www.atlascloud.ai?ref=PCAEL2',
+    siteUrl: 'https://www.atlascloud.ai',
     modelAIs: [
       { value: 'deepseek-ai/deepseek-v4-flash' },
       { value: 'zai-org/GLM-5.3' },
@@ -42,7 +42,7 @@ export const defaultAIPresets = [
     apiPathAI: '/chat/completions',
     modelAI: 'deepseek-ai/DeepSeek-V4-Flash',
     authHeaderNameAI: 'Authorization: Bearer',
-    siteUrl: 'https://cloud.siliconflow.cn/i/Xa85Yz6R'
+    siteUrl: 'https://cloud.siliconflow.cn'
   },
   {
     id: 'ApiSmart',
@@ -51,7 +51,7 @@ export const defaultAIPresets = [
     apiPathAI: '/chat/completions',
     modelAI: 'DEEPSEEK_V4_FLASH',
     authHeaderNameAI: 'Authorization: Bearer',
-    siteUrl: 'https://apismart.ai/?utm_source=electerm_app&utm_medium=link&utm_campaign=electerm'
+    siteUrl: 'https://apismart.ai/'
   },
   {
     id: 'apimart',
@@ -60,7 +60,7 @@ export const defaultAIPresets = [
     apiPathAI: '/chat/completions',
     modelAI: 'deepseek-v4-flash',
     authHeaderNameAI: 'Authorization: Bearer',
-    siteUrl: 'https://go.apimart.ai/gh-electerm'
+    siteUrl: 'https://apimart.ai'
   },
   {
     id: 'deepseek',
@@ -69,7 +69,7 @@ export const defaultAIPresets = [
     apiPathAI: '/chat/completions',
     modelAI: 'deepseek-chat',
     authHeaderNameAI: 'Authorization: Bearer',
-    siteUrl: 'https://platform.deepseek.com/api_keys?utm_source=electerm_app&utm_medium=link&utm_campaign=electerm'
+    siteUrl: 'https://platform.deepseek.com/api_keys'
   },
   {
     id: 'openai',
@@ -78,7 +78,7 @@ export const defaultAIPresets = [
     apiPathAI: '/chat/completions',
     modelAI: 'gpt-4o',
     authHeaderNameAI: 'Authorization: Bearer',
-    siteUrl: 'https://platform.openai.com/api-keys?utm_source=electerm_app&utm_medium=link&utm_campaign=electerm'
+    siteUrl: 'https://platform.openai.com/api-keys'
   },
   {
     id: 'anthropic',
@@ -92,7 +92,7 @@ export const defaultAIPresets = [
       { value: 'claude-opus-4-1' },
       { value: 'claude-haiku-4-5' }
     ],
-    siteUrl: 'https://console.anthropic.com/settings/keys?utm_source=electerm_app&utm_medium=link&utm_campaign=electerm'
+    siteUrl: 'https://console.anthropic.com/settings/keys'
   },
   {
     id: 'openrouter',
@@ -101,7 +101,7 @@ export const defaultAIPresets = [
     apiPathAI: '/chat/completions',
     modelAI: 'openai/gpt-4o-mini',
     authHeaderNameAI: 'Authorization: Bearer',
-    siteUrl: 'https://openrouter.ai/keys?utm_source=electerm_app&utm_medium=link&utm_campaign=electerm'
+    siteUrl: 'https://openrouter.ai/keys'
   },
   {
     id: 'orcarouter',
@@ -110,7 +110,7 @@ export const defaultAIPresets = [
     apiPathAI: '/chat/completions',
     modelAI: 'orcarouter/free',
     authHeaderNameAI: 'Authorization: Bearer',
-    siteUrl: 'https://www.orcarouter.ai/ref/ref_2c4884ca28b88a82593f'
+    siteUrl: 'https://www.orcarouter.ai'
   },
   {
     id: 'google',
@@ -159,7 +159,7 @@ export const defaultAIPresets = [
       { value: 'MiniMax-M3.1-Flash' },
       { value: 'MiniMax-M3' }
     ],
-    siteUrl: 'https://platform.minimax.io/user-center/basic-information/interface-key?utm_source=electerm_app&utm_medium=link&utm_campaign=electerm'
+    siteUrl: 'https://platform.minimax.io/user-center/basic-information/interface-key'
   },
   {
     id: 'minimax-cn',
@@ -175,7 +175,7 @@ export const defaultAIPresets = [
       { value: 'MiniMax-M3.1-Flash' },
       { value: 'MiniMax-M3' }
     ],
-    siteUrl: 'https://platform.minimaxi.com/user-center/basic-information/interface-key?utm_source=electerm_app&utm_medium=link&utm_campaign=electerm'
+    siteUrl: 'https://platform.minimaxi.com/user-center/basic-information/interface-key'
   },
   {
     id: 'xai',
@@ -231,8 +231,7 @@ export function getAIPresets () {
   const presets = [...defaultAIPresets]
   const customPreset = window.et?.defaultAIPreset
   if (customPreset) {
-    // keep the first preset (sponsor) on top, insert after it
-    presets.splice(1, 0, customPreset)
+    presets.unshift(customPreset)
   }
   return presets
 }

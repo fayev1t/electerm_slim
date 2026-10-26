@@ -1,7 +1,6 @@
-/**
- * create edit language file link
- */
+import { packInfo } from './constants'
 
-export default (lang) => {
-  return `https://github.com/electerm/electerm-locales/edit/master/locales/${lang}.js`
+export default function createLangEditLink (lang) {
+  const title = encodeURIComponent(`Translation feedback: ${lang}`)
+  return `${packInfo.bugs.url}/new?title=${title}`
 }

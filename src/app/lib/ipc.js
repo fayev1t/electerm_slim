@@ -50,9 +50,11 @@ const {
   getPendingDeepLink
 } = require('./deep-link')
 const { getPendingVvFile } = require('./vv-file-open')
+const { createElectermImporter } = require('./electerm-import')
 const {
   packInfo,
   appPath,
+  dataPath,
   isMac,
   exePath,
   isPortable,
@@ -83,6 +85,21 @@ const {
 } = require('./install-command')
 const { watchFile, unwatchFile } = require('./watch-file')
 const lookup = require('../common/lookup')
+let electermImporter
+function getElectermImporter () {
+  if (!electermImporter) {
+    electermImporter = createElectermImporter({
+      appDataPath: app.getPath('appData'),
+      dataPath,
+      legacyPaths: isPortable ? [require('path').join(exePath, 'electerm')] : [],
+      db: require('./db'),
+      decrypt: safeDecrypt,
+      getConfig: async () => (await getConfig(true)).config,
+      updateConfig: config => globalState.set('config', config)
+    })
+  }
+  return electermImporter
+}
 const {
   AIchat,
   AIchatWithTools,
@@ -190,6 +207,7 @@ function initIpc () {
       langMap,
       installSrc,
       appPath,
+      dataPath,
       exePath,
       isPortable,
       // where running widgets write their logs; the widget manager reads them
@@ -254,6 +272,8 @@ function initIpc () {
     safeEncrypt: (str) => safeEncrypt(str),
     safeDecrypt: (str) => safeDecrypt(str),
     dbAction,
+    getElectermImportInfo: source => getElectermImporter().inspect(source),
+    importElectermData: source => getElectermImporter().importData(source),
     getScreenSize,
     closeApp: (closeAction = '') => {
       globalState.set('closeAction', closeAction)

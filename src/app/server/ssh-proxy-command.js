@@ -6,7 +6,7 @@
  *
  * Used for:
  *  - netbird ssh proxy (auto-detected via `netbird ssh detect`, see
- *    https://github.com/electerm/electerm/issues/4500)
+ *    the SSH ProxyCommand compatibility report)
  *  - generic user-defined proxyCommand option (supports %h %p %r placeholders,
  *    e.g. `cloudflared access ssh --hostname %h`)
  *

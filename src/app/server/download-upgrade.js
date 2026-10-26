@@ -16,39 +16,11 @@ const globalState = require('./global-state')
 
 rp.defaults.proxy = false
 
-// GitHub and atomgit serve release assets from the same path shape:
-//   https://github.com/electerm/electerm/releases/download/<tag>/<file>
-//   https://atomgit.com/electerm/electerm/releases/download/<tag>/<file>
-// so only the two trailing segments (tag, file name) need carrying over.
-// The asset itself only exists on atomgit for the newest release: the sync
-// workflow empties every older release to stay under the attachment quota.
-function getAtomgitUrl (url) {
-  const arr = url.split('/')
-  const len = arr.length
-  return `https://atomgit.com/electerm/electerm/releases/download/${arr[len - 2]}/${arr[len - 1]}`
-}
-
-function getUrl (url, mirror) {
-  if (mirror === 'gh-proxy') {
-    return `https://electerm-mirror.html5beta.com/${url}`
-  } if (mirror === 'sourceforge') {
-    const arr = url.split('/')
-    const len = arr.length
-    return `https://master.dl.sourceforge.net/project/electerm.mirror/${arr[len - 2]}/${arr[len - 1]}?viasf=1`
-  } else if (mirror === 'r2') {
-    return `https://electerm-store.html5beta.com/r/${url.split('/').pop()}`
-  } else if (mirror === 'atomgit') {
-    return getAtomgitUrl(url)
-  } else {
-    return url
-  }
-}
-
-function getReleaseInfo (
-  filter, releaseInfoUrl, agent
-) {
+async function getReleaseInfo (agent) {
+  const { selectRelease, findReleaseAsset } = await import('../common/release-info.mjs')
   const conf = {
-    url: releaseInfoUrl,
+    url: packInfo.releaseApiUrl,
+    headers: { Accept: 'application/vnd.github+json' },
     timeout: 15000
   }
   if (agent) {
@@ -57,10 +29,7 @@ function getReleaseInfo (
   }
   return rp(conf)
     .then((res) => {
-      return res.data
-        .release
-        .assets
-        .filter(filter)[0]
+      return findReleaseAsset(selectRelease(res.data), installSrc, packInfo.name)
     })
 }
 
@@ -73,32 +42,22 @@ class Upgrade {
     const {
       id,
       ws,
-      proxy,
-      mirror
+      proxy
     } = this.options
     const agent = createProxyAgent(proxy)
-    const releaseInfoUrl = `${packInfo.homepage}/data/electerm-github-release.json?_=${+new Date()}`
-    const filter = r => {
-      return r.name.endsWith(installSrc)
+    let releaseInfo
+    try {
+      releaseInfo = await getReleaseInfo(agent)
+    } catch (err) {
+      this.onError(err, id, ws)
+      return
     }
-    // if (isWin) {
-    //   filter = r => /electerm-\d+\.\d+\.\d+-win-x64\.tar\.gz/.test(r.name)
-    // } else if (isArm) {
-    //   filter = r => {
-    //     return /arm64\.dmg$/.test(r.name)
-    //   }
-    // } else if (isMac) {
-    //   filter = r => {
-    //     return /mac\.dmg$/.test(r.name)
-    //   }
-    // }
-    const releaseInfo = await getReleaseInfo(filter, releaseInfoUrl, agent)
-      .catch(this.onError)
     if (!releaseInfo) {
+      this.onError(new Error('No matching installer in this release'), id, ws)
       return
     }
     const localPath = resolve(tempDir, releaseInfo.name)
-    const remotePath = getUrl(releaseInfo.browser_download_url, mirror)
+    const remotePath = releaseInfo.browser_download_url
     await rmrf(localPath).catch(log.error)
     const { size } = releaseInfo
     this.id = id
@@ -182,7 +141,7 @@ class Upgrade {
 
   onError (err, id, ws) {
     ws.s({
-      wid: 'upgrade:err:' + id,
+      id: 'upgrade:err:' + id,
       error: {
         message: err.message,
         stack: err.stack

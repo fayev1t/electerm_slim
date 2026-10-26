@@ -1,6 +1,10 @@
 const log = require('electron-log')
 const { isDev } = require('./runtime-constants')
 
+if (process.env.ELECTERM_SLIM_DATA_PATH) {
+  log.transports.file.resolvePath = () => require('path').join(process.env.ELECTERM_SLIM_DATA_PATH, 'logs', process.type === 'browser' ? 'main.log' : 'backend.log')
+}
+
 log.transports.console.format = '{h}:{i}:{s} {level} › {text}'
 
 // electron-log 4.3.5 gets this one backwards: its isDev() returns
@@ -17,7 +21,7 @@ if (log.transports?.ipc) {
 // ate the whole SSH protocol trace: session-ssh.js hands ssh2
 // `connectOptions.debug = log.log`, and log.log is level `info`, so with the
 // `debug` setting on the app asked ssh2 for a trace that could never reach
-// ~/.config/electerm/logs/main.log -- exactly the evidence an "old switch
+// ~/.config/electerm_slim/logs/main.log -- exactly the evidence an "old switch
 // refuses to connect" report needs (Local ident / Remote ident / the kex line).
 // Debug mode therefore has to move the level as well as the flag.
 const DEBUG_LEVEL = 'debug'

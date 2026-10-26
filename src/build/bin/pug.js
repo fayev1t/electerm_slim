@@ -17,15 +17,6 @@ const targetFilePath = resolve(
   '../../../work/app/assets/index.html'
 )
 const pugContent = fs.readFileSync(entryPug, 'utf-8')
-const defaultAIPreset = {
-  baseURLAI: 'https://ai.electerm.org/api/ai',
-  apiPathAI: '/chat/completions',
-  modelAI: 'free',
-  authHeaderNameAI: 'Authorization: Bearer',
-  id: 'ai.electerm.org',
-  nameAI: 'ai.electerm.org',
-  siteUrl: 'https://ai.electerm.org?utm=electerm'
-}
 
 // const AIDisclamer = 'AI-generated terminal commands can be inaccurate or unsafe, be careful'
 
@@ -33,7 +24,6 @@ const data = {
   version: pack.version,
   siteName: pack.name,
   isDev: false,
-  defaultAIPreset,
   // The entry bundle statically imports ~190 chunks. index.html is built here
   // rather than by Vite, so Vite's automatic modulepreload injection never ran
   // and the browser only discovers those chunks after the entry bundle has been
@@ -46,7 +36,7 @@ const data = {
 function getEntryChunks () {
   const entry = resolve(
     __dirname,
-    `../../../work/app/assets/js/electerm-${pack.version}.js`
+    `../../../work/app/assets/js/electerm_slim-${pack.version}.js`
   )
   try {
     const src = fs.readFileSync(entry, 'utf-8')

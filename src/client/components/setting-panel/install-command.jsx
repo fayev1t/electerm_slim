@@ -25,7 +25,7 @@ export default function InstallCommand () {
       const s = await window.pre.runGlobalAsync('getElectermCommandStatus')
       setStatus(s)
     } catch (err) {
-      console.error('Failed to read electerm command status', err)
+      console.error('Failed to read electerm_slim command status', err)
     }
   }, [])
 
@@ -40,7 +40,7 @@ export default function InstallCommand () {
       if (res && res.ok) {
         message.success(okText)
       } else {
-        message.error((res && res.message) || 'Failed to update the electerm command')
+        message.error((res && res.message) || 'Failed to update the electerm_slim command')
       }
       await refresh()
     } catch (err) {
@@ -51,9 +51,9 @@ export default function InstallCommand () {
   }
 
   const handleInstall = () =>
-    run('installElectermCommand', `electerm ${t('command')} installed`)
+    run('installElectermCommand', `electerm_slim ${t('command')} installed`)
   const handleUninstall = () =>
-    run('uninstallElectermCommand', `electerm ${t('command')} removed`)
+    run('uninstallElectermCommand', `electerm_slim ${t('command')} removed`)
 
   if (!status) {
     return null
@@ -72,7 +72,7 @@ export default function InstallCommand () {
     <div className='pd2b'>
       <div className='pd1b'>
         <Space size='small' wrap>
-          <span className='inline-title'>{t('install')} electerm {t('command')} to PATH</span>
+          <span className='inline-title'>{t('install')} electerm_slim {t('command')} to PATH</span>
           <HelpIcon link={installCommandHelpLink} />
           <Tag
             variant='solid'

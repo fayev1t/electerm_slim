@@ -112,6 +112,7 @@ module.exports = {
     return {
       sep: require('path').sep,
       ...constants,
+      dataPath: require('../common/app-props').dataPath,
       versions: JSON.stringify(process.versions),
       transferKeys,
       fsFunctions: [

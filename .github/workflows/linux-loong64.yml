@@ -1,4 +1,4 @@
-# Build electerm for loong64 (LoongArch64) Linux
+# Build electerm_slim for loong64 (LoongArch64) Linux
 #
 # This workflow:
 # 1. Builds x64 version with electron v39.2.7 to get the asar
@@ -66,8 +66,8 @@ jobs:
     - name: Verify output
       run: |
         ls -la dist-loong64/*.tar.gz dist-loong64/*.deb
-        file dist-loong64/electerm-*/electerm
-        find dist-loong64/electerm-* -name "*.node" -exec file {} \; | grep LoongArch
+        file dist-loong64/electerm_slim-*/electerm-slim
+        find dist-loong64/electerm_slim-* -name "*.node" -exec file {} \; | grep LoongArch
 
     - name: Upload to R2
       if: ${{ contains(github.event.head_commit.message, '[r2]') }}

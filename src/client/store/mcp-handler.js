@@ -1143,9 +1143,9 @@ export default Store => {
     }
 
     const taskId = `bg-${Date.now()}-${++bgTaskCounter}`
-    const logFile = `/tmp/electerm-${taskId}.log`
-    const pidFile = `/tmp/electerm-${taskId}.pid`
-    const exitFile = `/tmp/electerm-${taskId}.exit`
+    const logFile = `/tmp/electerm_slim-${taskId}.log`
+    const pidFile = `/tmp/electerm_slim-${taskId}.pid`
+    const exitFile = `/tmp/electerm_slim-${taskId}.exit`
 
     // Encode command as base64 to avoid all quote-escaping issues.
     // The subshell runs the user's command, captures its exit code, then cleans up the PID file.

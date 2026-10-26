@@ -1,4 +1,4 @@
-# Build electerm for loong64 (LoongArch64) Linux - Legacy (old world)
+# Build electerm_slim for loong64 (LoongArch64) Linux - Legacy (old world)
 #
 # This workflow:
 # 1. Installs GCC 8 cross-compiler (old-world ABI) from loongson-community GitHub mirror
@@ -106,11 +106,11 @@ jobs:
     - name: Verify output
       run: |
         ls -la dist-loong64-legacy/*.tar.gz dist-loong64-legacy/*.deb
-        file dist-loong64-legacy/electerm-*/electerm
+        file dist-loong64-legacy/electerm_slim-*/electerm-slim
         echo "=== Native modules ==="
-        find dist-loong64-legacy/electerm-* -name "*.node" -exec sh -c 'echo "--- $1 ---"; file "$1"; readelf -h "$1" 2>/dev/null | grep -E "Machine|Class"; readelf -d "$1" 2>/dev/null | grep NEEDED' _ {} \;
+        find dist-loong64-legacy/electerm_slim-* -name "*.node" -exec sh -c 'echo "--- $1 ---"; file "$1"; readelf -h "$1" 2>/dev/null | grep -E "Machine|Class"; readelf -d "$1" 2>/dev/null | grep NEEDED' _ {} \;
         echo "=== pty.node symbols (forkpty/openpty) ==="
-        find dist-loong64-legacy/electerm-* -name "pty.node" -exec readelf -s {} \; 2>/dev/null | grep -iE "forkpty|openpty|pty" || true
+        find dist-loong64-legacy/electerm_slim-* -name "pty.node" -exec readelf -s {} \; 2>/dev/null | grep -iE "forkpty|openpty|pty" || true
         echo "=== Build logs ==="
         cat /tmp/node-pty-build.log 2>/dev/null | tail -50 || echo "No node-pty build log"
         cat /tmp/serialport-build.log 2>/dev/null | tail -30 || echo "No serialport build log"

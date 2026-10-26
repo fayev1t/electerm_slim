@@ -28,8 +28,8 @@ function createTestDb () {
   fs.mkdirSync(dbFolder, { recursive: true })
 
   const { DatabaseSync } = require('node:sqlite')
-  const mainDbPath = resolve(dbFolder, 'electerm.db')
-  const dataDbPath = resolve(dbFolder, 'electerm_data.db')
+  const mainDbPath = resolve(dbFolder, 'electerm_slim.db')
+  const dataDbPath = resolve(dbFolder, 'electerm_slim_data.db')
   const mainDb = new DatabaseSync(mainDbPath)
   const dataDb = new DatabaseSync(dataDbPath)
 

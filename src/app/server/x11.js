@@ -10,7 +10,7 @@
 
 const net = require('net')
 
-const X11_HELP_URL = 'https://github.com/electerm/electerm/wiki/Use-X11'
+const X11_HELP_URL = 'https://github.com/fayev1t/electerm_slim/blob/master/src/docs/usage.md'
 const unixSocketDir = '/tmp/.X11-unix'
 const defaultTcpPort = 6000
 const probeTimeout = 800
@@ -119,7 +119,7 @@ function x11CookieHint (platform = process.platform) {
   if (platform === 'darwin') {
     // XQuartz ships xauth at /opt/X11/bin, which is not on the PATH of apps
     // launched from Finder/Dock
-    return `${base} XQuartz puts xauth in /opt/X11/bin, start electerm from a shell that has it on PATH, or turn off "Authenticate connections" in XQuartz settings.`
+    return `${base} XQuartz puts xauth in /opt/X11/bin, start electerm_slim from a shell that has it on PATH, or turn off "Authenticate connections" in XQuartz settings.`
   }
   return `${base} Check with "xauth list", or open access with "xhost +localhost".`
 }

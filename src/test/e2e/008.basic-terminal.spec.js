@@ -20,6 +20,8 @@ describe('terminal', function () {
     const electronApp = await electron.launch(appOptions)
     const client = await electronApp.firstWindow()
     extendClient(client, electronApp)
+    await client.waitForFunction(() => window.store?.configLoaded)
+    await client.evaluate(() => window.store.initFirstTab())
     const cmd = isWin
       ? 'dir'
       : 'ls'

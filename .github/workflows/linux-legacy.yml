@@ -1,4 +1,4 @@
-# Simplified workflow using custom electerm-builder Docker image
+# Simplified workflow using custom electerm_slim-builder Docker image
 name: linux-legacy-docker
 
 on:
@@ -17,8 +17,8 @@ jobs:
     - name: Clone repository to /tmp and setup
       run: |
         cd /tmp
-        git clone https://github.com/electerm/electerm.git electerm_build
-        cd electerm_build
+        git clone https://github.com/fayev1t/electerm_slim.git electerm_slim_build
+        cd electerm_slim_build
         git checkout ${{ github.sha }}
         
         # Configure npm to use /tmp for cache and global packages
@@ -31,7 +31,7 @@ jobs:
         echo "npm_config_prefix=/tmp/.npm-global" >> $GITHUB_ENV
 
     - name: Verify pre-installed versions
-      working-directory: /tmp/electerm_build
+      working-directory: /tmp/electerm_slim_build
       run: |
         echo "=== Pre-installed versions ==="
         node --version
@@ -44,15 +44,15 @@ jobs:
         fpm --version
 
     - name: Clear electron-builder cache
-      working-directory: /tmp/electerm_build
+      working-directory: /tmp/electerm_slim_build
       run: rm -rf ~/.cache/electron-builder
 
     - name: ci init
-      working-directory: /tmp/electerm_build
+      working-directory: /tmp/electerm_slim_build
       run: npm config set legacy-peer-deps true
 
     - name: Update electron version and remove package-lock
-      working-directory: /tmp/electerm_build
+      working-directory: /tmp/electerm_slim_build
       run: |
         node -e "
         const fs = require('fs');
@@ -69,16 +69,16 @@ jobs:
         "
 
     - name: Install npm dependencies
-      working-directory: /tmp/electerm_build
+      working-directory: /tmp/electerm_slim_build
       run: npm i && npm i -S @electron/rebuild@3.7.2
 
     - name: Install R2 dependencies if needed
-      working-directory: /tmp/electerm_build
+      working-directory: /tmp/electerm_slim_build
       if: ${{ contains(github.event.head_commit.message, '[r2]') }}
       run: npm i -D @aws-sdk/client-s3
 
     - name: Verify updated dependencies
-      working-directory: /tmp/electerm_build
+      working-directory: /tmp/electerm_slim_build
       run: |
         echo "Verifying updated dependencies:"
         npm list electron --depth=0
@@ -88,15 +88,15 @@ jobs:
         npm list vite --depth=0
 
     - name: Build application
-      working-directory: /tmp/electerm_build
+      working-directory: /tmp/electerm_slim_build
       run: npm run b
     
     - name: Run pb
-      working-directory: /tmp/electerm_build
+      working-directory: /tmp/electerm_slim_build
       run: npm run pb
 
     - name: Build legacy packages
-      working-directory: /tmp/electerm_build
+      working-directory: /tmp/electerm_slim_build
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         BUILD_NUMBER: ${{ secrets.BUILD_NUMBER }}

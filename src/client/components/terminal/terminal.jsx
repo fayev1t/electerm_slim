@@ -9,7 +9,8 @@ import classnames from 'classnames'
 import './terminal.styl'
 import {
   paneMap,
-  connectionMap
+  connectionMap,
+  statusMap
 } from '../../common/constants.js'
 import {
   AimOutlined
@@ -63,7 +64,7 @@ class Term extends Component {
     super(props)
     applyMixins(this, mixins)
     this.state = {
-      loading: false,
+      loading: true,
       hasSelection: false,
       saveTerminalLogToFile: !!this.props.config.saveTerminalLogToFile,
       addTimeStampToTermLog: !!this.props.config.addTimeStampToTermLog,
@@ -153,8 +154,11 @@ class Term extends Component {
     // otherwise end as a silent unhandled rejection with a permanently blank
     // terminal pane
     this.initTerminal().catch(e => {
+      if (this.onClose) return
       console.error(e)
       this.handleError({ message: e.message })
+      this.setState({ loading: false, sessionStopped: true })
+      this.setStatus(statusMap.error)
     })
     if (this.props.tab.enableSsh === false) {
       this.props.tab.pane = paneMap.fileManager
