@@ -31,8 +31,6 @@ name: sync-release-to-atomgit
 # empty shells plus their 4 source archives (a few KB). Attachments are the
 # only real space, and those we do delete.
 on:
-  release:
-    types: [published]
   push:
     branches: [ atom ]
   workflow_dispatch:

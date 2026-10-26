@@ -1,15 +1,9 @@
 name: Publish to WinGet
 on:
-  release:
-    types: [released]
   push:
     branches: [test-winget]
 jobs:
   publish:
-    # Allow real releases plus manual verification via pushes to test-winget.
-    # NOTE: previously `if: github.event_name == 'release'` made pushes to
-    # test-winget a no-op, so sync problems could not be tested.
-    if: github.event_name == 'release' || github.ref == 'refs/heads/test-winget'
     runs-on: ubuntu-24.04
     environment: build
     steps:
@@ -43,8 +37,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.WINGET_TOKEN }}
       - id: tag
-        name: Resolve release tag (push test runs have no release event)
-        if: github.event_name != 'release'
+        name: Resolve latest release tag
         run: echo "tag=$(gh api repos/${{ github.repository }}/releases/latest --jq '.tag_name')" >> "$GITHUB_OUTPUT"
         env:
           GH_TOKEN: ${{ github.token }}
@@ -53,7 +46,5 @@ jobs:
           identifier: electerm.electerm
           installers-regex: 'win-(x64|arm64)-installer\.exe$'
           max-versions-to-keep: 30
-          # On `release` events this resolves to the release tag; on
-          # test-winget pushes it resolves to the latest release tag above.
-          release-tag: ${{ github.event.release.tag_name || steps.tag.outputs.tag }}
+          release-tag: ${{ steps.tag.outputs.tag }}
           token: ${{ secrets.WINGET_TOKEN }}

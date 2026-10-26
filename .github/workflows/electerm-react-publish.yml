@@ -1,7 +1,5 @@
 name: electerm-react-publish
 on:
-  release:
-    types: [published]
   push:
     branches: [ electerm-react ]
 # id-token: write is REQUIRED for npm trusted publishing (OIDC) to work

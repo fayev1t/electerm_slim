@@ -1,12 +1,10 @@
-# Upload the snap asset to the Snap Store after a new release is published.
+# Upload an existing release's snap asset when the snap branch is pushed.
 # Downloads the .snap built by linux-rpm-snap from the GitHub release and
 # publishes it to both the edge and stable channels.
 
 name: snap-store-upload
 
 on:
-  release:
-    types: [released]
   push:
     branches: [ snap ]
 

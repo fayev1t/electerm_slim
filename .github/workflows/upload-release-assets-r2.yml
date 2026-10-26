@@ -1,7 +1,5 @@
 name: upload-release-assets-to-r2
 on:
-  release:
-    types: [published]
   push:
     branches: [ r2 ]
 jobs:
