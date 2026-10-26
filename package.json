@@ -1,6 +1,6 @@
 {
   "name": "electerm_slim",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "electerm_slim terminal, SSH and SFTP client for desktop.",
   "main": "app.js",
   "scripts": {
