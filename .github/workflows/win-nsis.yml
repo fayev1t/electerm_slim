@@ -90,15 +90,35 @@ jobs:
 
     - name: Check packaged native modules
       run: |
+        # Loading node-pty is not enough: local terminals also need the
+        # conpty.dll that src/build/bin/after-pack.js copies into the package,
+        # so start a real shell through it.
         $script = @'
+        const fs = require('node:fs')
         const path = require('node:path')
         const modules = path.resolve('dist/win-unpacked/resources/app.asar/node_modules')
-        require(path.join(modules, 'node-pty'))
+        const pty = require(path.join(modules, 'node-pty'))
         require(path.join(modules, 'serialport'))
         console.log('Windows native modules loaded successfully')
+        const dll = path.resolve('dist/win-unpacked/resources/app.asar.unpacked/node_modules/node-pty/build/Release/conpty/conpty.dll')
+        if (!fs.existsSync(dll)) {
+          console.error('Missing ' + dll)
+          process.exit(1)
+        }
+        const term = pty.spawn('cmd.exe', [], { useConptyDll: true })
+        term.onData(() => {
+          console.log('Local terminal started through conpty.dll')
+          try { term.kill() } catch (err) {}
+          process.exit(0)
+        })
+        setTimeout(() => {
+          console.error('Local terminal printed nothing within 30 seconds')
+          process.exit(1)
+        }, 30000)
         '@
         $env:ELECTRON_RUN_AS_NODE = '1'
         & .\dist\win-unpacked\electerm_slim.exe -e $script
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     - name: Save installer for download
       uses: actions/upload-artifact@v4

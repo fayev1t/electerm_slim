@@ -15,7 +15,7 @@ import * as ls from '../common/safe-local-storage'
 import deepCopy from 'json-deep-copy'
 import generate from '../common/id-with-stamp'
 import uid from '../common/uid'
-import newTerm, { updateCount } from '../common/new-terminal.js'
+import { newLocalTerm, updateCount } from '../common/new-terminal.js'
 import { action } from 'manate'
 import { shouldCaptureTerminalReloadState } from '../components/terminal/ssh-reload-state.js'
 import dangerousSessionFields from '../common/dangerous-session-fields'
@@ -340,7 +340,7 @@ export default Store => {
   Store.prototype.initFirstTab = function (batch) {
     const { store } = window
     if (batch !== undefined) {
-      const newTab = newTerm()
+      const newTab = newLocalTerm()
       newTab.batch = batch // Set batch number
       store.addTab(newTab)
       return
@@ -348,7 +348,7 @@ export default Store => {
     const { layout } = store
     const batchCount = splitConfig[layout].children || 1
     for (let i = 0; i < batchCount; i++) {
-      const newTab = newTerm()
+      const newTab = newLocalTerm()
       newTab.batch = i // Set batch number
       store.addTab(newTab)
     }
@@ -381,7 +381,7 @@ export default Store => {
   }
 
   Store.prototype.addTab = function (
-    newTab = newTerm(),
+    newTab = newLocalTerm(),
     index,
     batch
   ) {
