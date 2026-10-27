@@ -18,6 +18,7 @@ import message from '../components/common/message'
 import fs from '../common/fs'
 import { parseVv, describeVv } from '../common/parse-vv'
 import { vvToTab } from '../common/vv-to-tab'
+import fixLocalType from '../common/fix-local-type'
 
 function getHost (argv, opts) {
   const arr = argv
@@ -313,6 +314,9 @@ export default (Store) => {
             ext[name] = dt
           }
         })
+      // after the snapshots, so the watchers save the repair; before
+      // openInitSessions, which can open bookmarks
+      ext.history = fixLocalType(ext.bookmarks, ext.history)
       ext.lastDataUpdateTime = await getData('lastDataUpdateTime') || 0
       ext.initLoadingData = false
       Object.assign(store, ext)
