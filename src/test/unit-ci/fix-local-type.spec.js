@@ -25,6 +25,7 @@ global.window = {
 }
 
 let fixLocalType
+let fixLocalTab
 
 const addr = { host: '192.168.1.2', port: 22, username: 'root' }
 
@@ -41,6 +42,7 @@ describe('fix-local-type', () => {
   before(async () => {
     const mod = await import('../../client/common/fix-local-type.js')
     fixLocalType = mod.default
+    fixLocalTab = mod.fixLocalTab
   })
 
   test('a history tab gets the type of the bookmark at the same address', () => {
@@ -102,5 +104,27 @@ describe('fix-local-type', () => {
     const res = fixLocalType([], history)
     assert.deepEqual(res.map(h => h.id), ['h1', 'h2', 'h-broken'])
     assert.equal(res[2].tab.type, 'ssh')
+  })
+
+  // what opening a tab and testing a connection call after applyProfileToTabs
+  test('fixLocalTab fixes one tab in place and says whether it changed it', () => {
+    const bookmarks = [
+      // still broken, so it must not hand its local type back
+      { id: 'b0', type: 'local', ...addr },
+      { id: 'b1', type: 'telnet', ...addr }
+    ]
+    const tab = { title: 'server', ...addr, type: 'local' }
+    assert.equal(fixLocalTab(tab, bookmarks), true)
+    assert.equal(tab.type, 'telnet')
+
+    const other = { ...addr, port: 2222, type: 'local' }
+    assert.equal(fixLocalTab(other, bookmarks), true)
+    assert.equal(other.type, 'ssh')
+
+    for (const kept of [{ type: 'local', title: 'bash' }, { ...addr, type: 'rdp' }]) {
+      const before = { ...kept }
+      assert.equal(fixLocalTab(kept, bookmarks), false)
+      assert.deepEqual(kept, before)
+    }
   })
 })

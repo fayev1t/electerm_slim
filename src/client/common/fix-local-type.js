@@ -15,6 +15,29 @@ function isWrongLocal (item) {
 }
 
 /**
+ * Give one broken tab or bookmark the type of a bookmark with the same
+ * address, or ssh. Fixed in place. Opening a tab and testing a connection
+ * run this after applyProfileToTabs, which can put the local type back after
+ * the stored data was repaired at startup.
+ * @param {object} item
+ * @param {array} bookmarks
+ * @return {boolean} whether the type was changed
+ */
+export function fixLocalTab (item, bookmarks = []) {
+  if (!isWrongLocal(item)) {
+    return false
+  }
+  const src = bookmarks.find(b =>
+    !isWrongLocal(b) &&
+    b.host === item.host &&
+    b.port === item.port &&
+    b.username === item.username
+  )
+  item.type = (src && src.type) || connectionMap.ssh
+  return true
+}
+
+/**
  * Give each broken bookmark and history tab the type of a bookmark with the
  * same address, or ssh, and merge history entries that become duplicates.
  * Bookmarks are fixed in place.
@@ -24,20 +47,12 @@ function isWrongLocal (item) {
  */
 export default function fixLocalType (bookmarks = [], history = []) {
   const sources = bookmarks.filter(b => !isWrongLocal(b))
-  const fix = item => {
-    const src = sources.find(b =>
-      b.host === item.host &&
-      b.port === item.port &&
-      b.username === item.username
-    )
-    item.type = (src && src.type) || connectionMap.ssh
-  }
-  bookmarks.filter(isWrongLocal).forEach(fix)
+  bookmarks.filter(isWrongLocal).forEach(b => fixLocalTab(b, sources))
   const fixed = new Set(history.filter(h => isWrongLocal(h.tab)))
   if (!fixed.size) {
     return history
   }
-  fixed.forEach(h => fix(h.tab))
+  fixed.forEach(h => fixLocalTab(h.tab, sources))
   // a fixed entry can now equal one saved before the bug: keep the newer
   // position and add up the counts
   const res = []
