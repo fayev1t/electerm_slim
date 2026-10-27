@@ -2,7 +2,7 @@
  * terminal/sftp/serial class
  */
 
-const { resolve: pathResolve } = require('path')
+const { resolveWindowsExec } = require('./windows-exec')
 const { TerminalBase } = require('./session-base')
 const globalState = require('./global-state')
 // const { MockBinding } = require('@serialport/binding-mock')
@@ -26,10 +26,7 @@ class TerminalLocal extends TerminalBase {
     const { platform } = process
     const isWin = platform.startsWith('win')
     const exec = isWin
-      ? pathResolve(
-        process.env.windir,
-        execWindows
-      )
+      ? resolveWindowsExec(process.env.windir, execWindows)
       : platform === 'darwin' ? execMac : execLinux
     if ((exec || '').includes('..')) {
       return Promise.reject(new Error('execWindows should not contain ".."'))

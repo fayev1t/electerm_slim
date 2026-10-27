@@ -22,6 +22,7 @@ import {
   getAlternateBufferSnapshot,
   shouldCaptureTerminalReloadState
 } from '../ssh-reload-state.js'
+import { fixLocalTab } from '../../../common/fix-local-type.js'
 
 // Expands \n \t \r \\ and \xHH hex byte escapes, used to let users type
 // control bytes (e.g. \x01 = Ctrl+A) in the serial "closeSequence" field.
@@ -88,6 +89,15 @@ export const socketMixin = {
     } = config
     const { logName } = this.props
     const tab = window.store.applyProfileToTabs(deepCopy(this.props.tab || {}))
+    // applyProfile runs after addTab, so a profile (or data that arrived
+    // after startup) can still put type local back on a remote host. The
+    // Windows local shell then path.resolves an undefined execWindows.
+    if (fixLocalTab(tab, window.store.bookmarks || [])) {
+      const live = (window.store.tabs || []).find(t => t.id === tab.id)
+      if (live) {
+        live.type = tab.type
+      }
+    }
     const {
       srcId, from = 'bookmarks',
       type,

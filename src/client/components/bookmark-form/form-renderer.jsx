@@ -19,6 +19,7 @@ import runIdle from '../../common/run-idle'
 import getInitItem from '../../common/init-setting-item'
 import testCon from '../../common/test-connection'
 import newTerm from '../../common/new-terminal'
+import { fixLocalTab } from '../../common/fix-local-type'
 import { isValidIP } from '../../common/is-ip'
 import { action as manateAction } from 'manate'
 
@@ -135,6 +136,7 @@ export default function FormRenderer ({ config, props, onForm }) {
     let msg = ''
     setTesting(true)
     options = window.store.applyProfileToTabs(options)
+    fixLocalTab(options, window.store.bookmarks || [])
     const res = await testCon(options)
       .then(r => r)
       .catch((e) => {

@@ -119,6 +119,10 @@ async function createStyleForTab (tab, props) {
           ? 'cover'
           : 'auto'
       }`,
+      // The default bg rule also fades the wordmark with `opacity`, which
+      // leaks onto this ::before the same way. User images keep full
+      // strength; their own Opacity setting goes through `filter`.
+      'opacity: 1',
       `filter: ${createFilterStyle(props, tab)}`
     )
   }
@@ -136,9 +140,13 @@ async function createGlobalStyle (props) {
     // `min(100%, 766px) auto` keeps the aspect ratio and scales it down to fit
     // the pane width, while leaving the desktop rendering (= natural size)
     // untouched.
+    // Unlike electerm's own watermark, which has ~10% alpha baked into the
+    // image, the wordmark is opaque white, so it is faded here. At full
+    // strength it sits right on top of the terminal text in dark themes.
     return '#container .session-batch-active .xterm-screen::before {' +
     'background-image: url("./images/electerm_slim-wordmark.png");' +
     `background-size: min(100%, ${watermarkWidth}px) auto;` +
+    'opacity: 0.08;' +
     '}'
   }
 

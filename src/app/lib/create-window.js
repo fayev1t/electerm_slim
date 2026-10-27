@@ -1,5 +1,5 @@
 const {
-  BrowserWindow, screen
+  BrowserWindow, screen, app
 } = require('electron')
 const { resolve } = require('path')
 const {
@@ -24,6 +24,7 @@ const getPort = require('./get-port')
 const globalState = require('./glob-state')
 const webviewHandler = require('./webview-handler')
 const { getTitleBarOptions, windowBackground } = require('./title-bar')
+const { clearCacheOnNewBuild } = require('./clear-cache-on-new-build')
 
 // A crashed / reloaded renderer leaves the window object alive, and sending to
 // it then throws "Render frame was disposed before WebFrameMain could be
@@ -106,6 +107,12 @@ exports.createWindow = async function (userConfig) {
     const dataUrl = `data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`
     win.loadURL(dataUrl)
   })
+  // dev has no buildTime and loads from Vite
+  await clearCacheOnNewBuild(
+    win.webContents.session,
+    packInfo.buildTime,
+    resolve(app.getPath('sessionData'), 'ui-build')
+  ).catch(err => console.error('Failed to clear the old UI cache:', err))
   win.loadURL(opts)
   win.webContents.once('dom-ready', () => {
     if (isDev && !userConfig.disableDeveloperTool) {

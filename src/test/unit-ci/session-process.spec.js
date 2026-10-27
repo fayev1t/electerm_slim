@@ -43,7 +43,15 @@ function createHarness ({ onStart, onSend } = {}) {
 
   vm.runInNewContext(source, {
     exports: api,
-    require: name => name === 'child_process' ? { fork } : require(name),
+    require: name => {
+      if (name === 'child_process') {
+        return { fork }
+      }
+      if (name.startsWith('.')) {
+        return require(path.resolve(path.dirname(filename), name))
+      }
+      return require(name)
+    },
     __dirname: path.dirname(filename),
     process: {
       env: { ELECTRON_RUN_AS_NODE: '1', wsPort: '30976', type: 'inherited-type' },
@@ -75,6 +83,33 @@ describe('session process startup', () => {
       assert.equal(children[0].options.env.type, 'local')
       assert.equal(children[0].options.env.ELECTRON_RUN_AS_NODE, undefined)
       assert.equal(timers.size, 0)
+    } finally {
+      api.cleanupTerminals()
+    }
+  })
+
+  test('a local session that still has a host is started as ssh', async () => {
+    let sent
+    const { api, children } = createHarness({
+      onSend (child, message, callback) {
+        sent = message
+        queueMicrotask(() => {
+          callback?.(null)
+          child.emit('message', { id: message.data.id, data: true })
+        })
+      }
+    })
+    const ws = { s () {}, once () {} }
+    try {
+      await api.terminal({
+        type: 'local',
+        termType: 'local',
+        host: '10.0.0.8',
+        uid: 'ssh-tab'
+      }, ws, 'request-ssh')
+      assert.equal(children[0].options.env.type, 'ssh')
+      assert.equal(sent.data.body.termType, 'ssh')
+      assert.equal(sent.data.body.type, 'ssh')
     } finally {
       api.cleanupTerminals()
     }

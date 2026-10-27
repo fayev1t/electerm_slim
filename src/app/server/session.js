@@ -2,6 +2,8 @@
  * terminal/sftp/serial class
  */
 
+const { normalizeSessionType } = require('./session-kind')
+
 /**
  * Dynamically load a module based on terminal type
  * @param {string} type - Terminal type
@@ -18,17 +20,7 @@ function loadModule (type) {
  * @returns {Promise} Terminal session
  */
 exports.startSession = async function (initOptions, ws, func = 'session') {
-  const type = initOptions.termType || initOptions.type || 'ssh'
-  const tail = [
-    'telnet',
-    'serial',
-    'local',
-    'rdp',
-    'vnc',
-    'spice'
-  ].includes(type)
-    ? type
-    : 'ssh'
-  const module = loadModule(tail)
+  const { moduleName } = normalizeSessionType(initOptions)
+  const module = loadModule(moduleName)
   return module[func](initOptions, ws)
 }

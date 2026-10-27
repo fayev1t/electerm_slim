@@ -14,6 +14,8 @@ const platform = os.platform()
 const isWin = platform === 'win32'
 
 pack.main = 'app.js'
+// tells builds of one version apart, see src/app/lib/clear-cache-on-new-build.js
+pack.buildTime = Date.now()
 delete pack.scripts
 delete pack.standard
 delete pack.files

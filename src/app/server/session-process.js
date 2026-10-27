@@ -1,5 +1,6 @@
 const { fork } = require('child_process')
 const path = require('path')
+const { normalizeSessionType } = require('./session-kind')
 
 // Map to store active terminal processes (pid -> {child, port, ws})
 const activeTerminals = new Map()
@@ -171,18 +172,9 @@ function onChildExit (child) {
 }
 
 exports.terminal = async function (initOptions, ws, uid) {
-  const type = initOptions.termType || initOptions.type || 'terminal'
+  const { type, isSsh } = normalizeSessionType(initOptions)
   const { child, port } = await runSessionServer(type)
   const pid = initOptions.uid
-  const isSsh = ![
-    'telnet',
-    'serial',
-    'local',
-    'rdp',
-    'vnc',
-    'spice',
-    'ftp'
-  ].includes(type)
   if (isSsh) {
     child.on('message', (m) => {
       const { type, data } = m
@@ -235,19 +227,10 @@ exports.terminal = async function (initOptions, ws, uid) {
 }
 
 exports.testConnection = async function (initOptions, ws, uid) {
-  const type = initOptions.termType || initOptions.type || 'terminal'
+  const { type, isSsh } = normalizeSessionType(initOptions)
   const { child } = await runSessionServer(type)
   child.once('exit', () => onChildExit(child))
 
-  const isSsh = ![
-    'telnet',
-    'serial',
-    'local',
-    'rdp',
-    'vnc',
-    'spice',
-    'ftp'
-  ].includes(type)
   if (isSsh && ws) {
     child.on('message', (m) => {
       const { type: msgType, data } = m
